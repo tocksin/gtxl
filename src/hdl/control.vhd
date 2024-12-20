@@ -68,9 +68,9 @@ begin
     ------          Operation decoding                 -------
     ----------------------------------------------------------
     operationDecoderComp : entity work.sn74hct138
-    port map(   iEn     => iInterrupt,
+    port map(   iEn     => '1',
                 iEnLo0  => iExecute,
-                iEnLo1  => '0',
+                iEnLo1  => iInterrupt,
                 iA      => iInst(5),
                 iB      => iInst(6),
                 iC      => iInst(7),
@@ -114,12 +114,10 @@ begin
     -- 110- [80,X]   , VID
     -- 111- [ Y,X++] , VID
     
-    modeEn <= operation(7) and iInterrupt;
-    
     modeDecoderComp : entity work.sn74hct138
-    port map(   iEn     => modeEn, -- disable during Bcc iInterrupt
+    port map(   iEn     => operation(7), -- disable during Bcc iInterrupt
                 iEnLo0  => iExecute,
-                iEnLo1  => '0',
+                iEnLo1  => iInterrupt,
                 iA      => iInst(2),
                 iB      => iInst(3),
                 iC      => iInst(4),

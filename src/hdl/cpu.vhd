@@ -109,7 +109,7 @@ begin
 
     rstN <= not iRst;
 
-    pcClear <= '0' when (iRst='1') or ((interrupt='0') and (execute='0')) else '1';
+    pcClear <= '0' when (iRst='1') or ((interrupt='1') and (execute='0')) else '1';
     ----------------------------------------------------------
     ------          State Machine                      -------
     ----------------------------------------------------------
@@ -419,25 +419,14 @@ begin
                 oData       => timerReg(7 downto 4),
                 oTerminal   => timerTC);
 
-    interrupt <= not timerTC;
+    interrupt <= timerTC;
     dataBus <= timerReg when ((bankEn(4)='0') and (memDriveEn='0')) else "ZZZZZZZZ";
     
     ----------------------------------------------------------
     ------        Interrupt Enable Register            -------
     ----------------------------------------------------------
-    -- intStateProc: process (iClk)
-    -- begin
-        -- if (rising_edge(iClk)) then
-            -- if (interrupt='0') then
-                -- intEn <= '1';       -- after reset, interrupts disabled
-            -- elsif (retI='0') then
-                -- intEn <= '0';       -- after reti, interrupts enabled
-            -- end if;
-        -- end if;
-    -- end process intStateProc;
+    intEnNext <= '1' when (interrupt='1') or ((intEn='1') and (retI='1')) else '0';
 
-    intEnNext <= '1' when (interrupt='0') or ((intEn='1') and (retI='1')) else '0';
-    
     intStateComp : entity work.sn74hct74
     port map(   iClk    => iClk,
                 iRstN   => '1',
