@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_video_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_video" />
+            <top_module name="tools_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="50000000000fs"></ZoomEndTime>
+      <Cursor1Time time="33329429340fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="250"></NameColumnWidth>
+      <ValueColumnWidth column_width="102"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="31" />
+   <wvobject fp_name="/tb_video/clkSys" type="logic">
+      <obj_property name="ElementShortName">clkSys</obj_property>
+      <obj_property name="ObjectShortName">clkSys</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/rstSys" type="logic">
+      <obj_property name="ElementShortName">rstSys</obj_property>
+      <obj_property name="ObjectShortName">rstSys</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/hSync" type="logic">
+      <obj_property name="ElementShortName">hSync</obj_property>
+      <obj_property name="ObjectShortName">hSync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vSync" type="logic">
+      <obj_property name="ElementShortName">vSync</obj_property>
+      <obj_property name="ObjectShortName">vSync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/videoEn" type="logic">
+      <obj_property name="ElementShortName">videoEn</obj_property>
+      <obj_property name="ObjectShortName">videoEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/pixelRow" type="array">
+      <obj_property name="ElementShortName">pixelRow[9:0]</obj_property>
+      <obj_property name="ObjectShortName">pixelRow[9:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/pixelCol" type="array">
+      <obj_property name="ElementShortName">pixelCol[9:0]</obj_property>
+      <obj_property name="ObjectShortName">pixelCol[9:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/subpixelRow" type="array">
+      <obj_property name="ElementShortName">subpixelRow[8:0]</obj_property>
+      <obj_property name="ObjectShortName">subpixelRow[8:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider68">
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/clkIn" type="logic">
+      <obj_property name="ElementShortName">clkIn</obj_property>
+      <obj_property name="ObjectShortName">clkIn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/rstIn" type="logic">
+      <obj_property name="ElementShortName">rstIn</obj_property>
+      <obj_property name="ObjectShortName">rstIn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/hSyncOut" type="logic">
+      <obj_property name="ElementShortName">hSyncOut</obj_property>
+      <obj_property name="ObjectShortName">hSyncOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/vSyncOut" type="logic">
+      <obj_property name="ElementShortName">vSyncOut</obj_property>
+      <obj_property name="ObjectShortName">vSyncOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/videoEnOut" type="logic">
+      <obj_property name="ElementShortName">videoEnOut</obj_property>
+      <obj_property name="ObjectShortName">videoEnOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/pixelRowOut" type="array">
+      <obj_property name="ElementShortName">pixelRowOut[9:0]</obj_property>
+      <obj_property name="ObjectShortName">pixelRowOut[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/pixelColOut" type="array">
+      <obj_property name="ElementShortName">pixelColOut[9:0]</obj_property>
+      <obj_property name="ObjectShortName">pixelColOut[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/subpixelRowOut" type="array">
+      <obj_property name="ElementShortName">subpixelRowOut[8:0]</obj_property>
+      <obj_property name="ObjectShortName">subpixelRowOut[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/subpixelColOut" type="array">
+      <obj_property name="ElementShortName">subpixelColOut[8:0]</obj_property>
+      <obj_property name="ObjectShortName">subpixelColOut[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/horiz_sync" type="logic">
+      <obj_property name="ElementShortName">horiz_sync</obj_property>
+      <obj_property name="ObjectShortName">horiz_sync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/vert_sync" type="logic">
+      <obj_property name="ElementShortName">vert_sync</obj_property>
+      <obj_property name="ObjectShortName">vert_sync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/video_on_v" type="logic">
+      <obj_property name="ElementShortName">video_on_v</obj_property>
+      <obj_property name="ObjectShortName">video_on_v</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/video_on_h" type="logic">
+      <obj_property name="ElementShortName">video_on_h</obj_property>
+      <obj_property name="ObjectShortName">video_on_h</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/h_count" type="array">
+      <obj_property name="ElementShortName">h_count[9:0]</obj_property>
+      <obj_property name="ObjectShortName">h_count[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/v_count" type="array">
+      <obj_property name="ElementShortName">v_count[9:0]</obj_property>
+      <obj_property name="ObjectShortName">v_count[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/h_divider" type="array">
+      <obj_property name="ElementShortName">h_divider[2:0]</obj_property>
+      <obj_property name="ObjectShortName">h_divider[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/v_divider" type="array">
+      <obj_property name="ElementShortName">v_divider[2:0]</obj_property>
+      <obj_property name="ObjectShortName">v_divider[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/h_subcount" type="array">
+      <obj_property name="ElementShortName">h_subcount[8:0]</obj_property>
+      <obj_property name="ObjectShortName">h_subcount[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/v_subcount" type="array">
+      <obj_property name="ElementShortName">v_subcount[8:0]</obj_property>
+      <obj_property name="ObjectShortName">v_subcount[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/h_return" type="logic">
+      <obj_property name="ElementShortName">h_return</obj_property>
+      <obj_property name="ObjectShortName">h_return</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/v_return" type="logic">
+      <obj_property name="ElementShortName">v_return</obj_property>
+      <obj_property name="ObjectShortName">v_return</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_video/vgaGenComp/divider" type="other">
+      <obj_property name="ElementShortName">divider</obj_property>
+      <obj_property name="ObjectShortName">divider</obj_property>
+   </wvobject>
+</wave_config>

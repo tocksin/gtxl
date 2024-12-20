@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_basys_demo_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="sys_description_pkg" />
+            <top_module name="tb_basys_demo" />
+            <top_module name="tools_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="1000000000fs"></ZoomEndTime>
+      <Cursor1Time time="22095fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="132"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="54" />
+   <wvobject fp_name="/tb_basys_demo/clkSys" type="logic">
+      <obj_property name="ElementShortName">clkSys</obj_property>
+      <obj_property name="ObjectShortName">clkSys</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/iClk" type="logic">
+      <obj_property name="ElementShortName">iClk</obj_property>
+      <obj_property name="ObjectShortName">iClk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/iRst" type="logic">
+      <obj_property name="ElementShortName">iRst</obj_property>
+      <obj_property name="ObjectShortName">iRst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/pcClear" type="logic">
+      <obj_property name="ElementShortName">pcClear</obj_property>
+      <obj_property name="ObjectShortName">pcClear</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/instFetch" type="logic">
+      <obj_property name="ElementShortName">instFetch</obj_property>
+      <obj_property name="ObjectShortName">instFetch</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/immFetch" type="logic">
+      <obj_property name="ElementShortName">immFetch</obj_property>
+      <obj_property name="ObjectShortName">immFetch</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/execute" type="logic">
+      <obj_property name="ElementShortName">execute</obj_property>
+      <obj_property name="ObjectShortName">execute</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/loadPC" type="logic">
+      <obj_property name="ElementShortName">loadPC</obj_property>
+      <obj_property name="ObjectShortName">loadPC</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/PCReg" type="array">
+      <obj_property name="ElementShortName">PCReg[15:0]</obj_property>
+      <obj_property name="ObjectShortName">PCReg[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/mauSel" type="logic">
+      <obj_property name="ElementShortName">mauSel</obj_property>
+      <obj_property name="ObjectShortName">mauSel</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/memAddr" type="array">
+      <obj_property name="ElementShortName">memAddr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">memAddr[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/bankEn" type="array">
+      <obj_property name="ElementShortName">bankEn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">bankEn[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/dataRom" type="array">
+      <obj_property name="ElementShortName">dataRom[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataRom[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/dataBus" type="array">
+      <obj_property name="ElementShortName">dataBus[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataBus[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/yBusDriveEn" type="logic">
+      <obj_property name="ElementShortName">yBusDriveEn</obj_property>
+      <obj_property name="ObjectShortName">yBusDriveEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/yBufDriveEn" type="logic">
+      <obj_property name="ElementShortName">yBufDriveEn</obj_property>
+      <obj_property name="ObjectShortName">yBufDriveEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/mauDisableLo" type="logic">
+      <obj_property name="ElementShortName">mauDisableLo</obj_property>
+      <obj_property name="ObjectShortName">mauDisableLo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/yBus" type="array">
+      <obj_property name="ElementShortName">yBus[7:0]</obj_property>
+      <obj_property name="ObjectShortName">yBus[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/instReg" type="array">
+      <obj_property name="ElementShortName">instReg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">instReg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/immeComp/data" type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data[7:0]</obj_property>
+      <obj_property name="label">immReg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/opName" type="array">
+      <obj_property name="ElementShortName">opName[1:3]</obj_property>
+      <obj_property name="ObjectShortName">opName[1:3]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/modeName" type="array">
+      <obj_property name="ElementShortName">modeName[1:12]</obj_property>
+      <obj_property name="ObjectShortName">modeName[1:12]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/busSrc" type="array">
+      <obj_property name="ElementShortName">busSrc[3:0]</obj_property>
+      <obj_property name="ObjectShortName">busSrc[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/busDriveName" type="array">
+      <obj_property name="ElementShortName">busDriveName[1:8]</obj_property>
+      <obj_property name="ObjectShortName">busDriveName[1:8]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/fullName" type="array">
+      <obj_property name="ElementShortName">fullName[1:15]</obj_property>
+      <obj_property name="ObjectShortName">fullName[1:15]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/aluComp/iDataA" type="array">
+      <obj_property name="ElementShortName">iDataA[7:0]</obj_property>
+      <obj_property name="ObjectShortName">iDataA[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/aluComp/iDataB" type="array">
+      <obj_property name="ElementShortName">iDataB[7:0]</obj_property>
+      <obj_property name="ObjectShortName">iDataB[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/aluData" type="array">
+      <obj_property name="ElementShortName">aluData[7:0]</obj_property>
+      <obj_property name="ObjectShortName">aluData[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oImmDrive" type="logic">
+      <obj_property name="ElementShortName">oImmDrive</obj_property>
+      <obj_property name="ObjectShortName">oImmDrive</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oAccDrive" type="logic">
+      <obj_property name="ElementShortName">oAccDrive</obj_property>
+      <obj_property name="ObjectShortName">oAccDrive</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oMemDrive" type="logic">
+      <obj_property name="ElementShortName">oMemDrive</obj_property>
+      <obj_property name="ObjectShortName">oMemDrive</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oAcLoad" type="logic">
+      <obj_property name="ElementShortName">oAcLoad</obj_property>
+      <obj_property name="ObjectShortName">oAcLoad</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oXLoad" type="logic">
+      <obj_property name="ElementShortName">oXLoad</obj_property>
+      <obj_property name="ObjectShortName">oXLoad</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oYLoad" type="logic">
+      <obj_property name="ElementShortName">oYLoad</obj_property>
+      <obj_property name="ObjectShortName">oYLoad</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oVidLoad" type="logic">
+      <obj_property name="ElementShortName">oVidLoad</obj_property>
+      <obj_property name="ObjectShortName">oVidLoad</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oIncX" type="logic">
+      <obj_property name="ElementShortName">oIncX</obj_property>
+      <obj_property name="ObjectShortName">oIncX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/acReg" type="array">
+      <obj_property name="ElementShortName">acReg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">acReg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/xReg" type="array">
+      <obj_property name="ElementShortName">xReg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">xReg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/yComp/data" type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data[7:0]</obj_property>
+      <obj_property name="label">yReg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/vidReg" type="array">
+      <obj_property name="ElementShortName">vidReg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vidReg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oIncX" type="logic">
+      <obj_property name="ElementShortName">oIncX</obj_property>
+      <obj_property name="ObjectShortName">oIncX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/ramWrN" type="logic">
+      <obj_property name="ElementShortName">ramWrN</obj_property>
+      <obj_property name="ObjectShortName">ramWrN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/iCarry" type="logic">
+      <obj_property name="ElementShortName">iCarry</obj_property>
+      <obj_property name="ObjectShortName">iCarry</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/iSign" type="logic">
+      <obj_property name="ElementShortName">iSign</obj_property>
+      <obj_property name="ObjectShortName">iSign</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oPCLoadLo" type="logic">
+      <obj_property name="ElementShortName">oPCLoadLo</obj_property>
+      <obj_property name="ObjectShortName">oPCLoadLo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/controlComp/oPCLoadHi" type="logic">
+      <obj_property name="ElementShortName">oPCLoadHi</obj_property>
+      <obj_property name="ObjectShortName">oPCLoadHi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerReg" type="array">
+      <obj_property name="ElementShortName">timerReg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">timerReg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerTC" type="logic">
+      <obj_property name="ElementShortName">timerTC</obj_property>
+      <obj_property name="ObjectShortName">timerTC</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/rstN" type="logic">
+      <obj_property name="ElementShortName">rstN</obj_property>
+      <obj_property name="ObjectShortName">rstN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/interrupt" type="logic">
+      <obj_property name="ElementShortName">interrupt</obj_property>
+      <obj_property name="ObjectShortName">interrupt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/intEn" type="logic">
+      <obj_property name="ElementShortName">intEn</obj_property>
+      <obj_property name="ObjectShortName">intEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/iClk" type="logic">
+      <obj_property name="ElementShortName">iClk</obj_property>
+      <obj_property name="ObjectShortName">iClk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/intEnClk" type="logic">
+      <obj_property name="ElementShortName">intEnClk</obj_property>
+      <obj_property name="ObjectShortName">intEnClk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/retI" type="logic">
+      <obj_property name="ElementShortName">retI</obj_property>
+      <obj_property name="ObjectShortName">retI</obj_property>
+   </wvobject>
+</wave_config>
