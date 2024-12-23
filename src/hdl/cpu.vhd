@@ -95,6 +95,7 @@ architecture ttl of cpu is
     signal timerTermLo  : sl;
     signal timerReg     : slv(7 downto 0) := x"00";
     signal timerTC      : sl;
+    signal timerDriveEn : sl;
     signal interrupt    : sl;
     signal intEn        : sl := '1';
     signal intClear     : sl;
@@ -237,10 +238,10 @@ begin
     -- $8000-$FFFF  RAM  (32k)
 
     -- decoder divider addresses into:
-    -- $0000-$1FFF ROM
-    -- $1000-$2FFF ROM
-    -- $2000-$3FFF ROM
-    -- $3000-$4FFF ROM
+    -- $0000-$0FFF ROM
+    -- $1000-$1FFF ROM
+    -- $2000-$2FFF ROM
+    -- $3000-$3FFF ROM
     -- $4000-$4FFF Timer
     -- $5000-$5FFF I/O - shift register for controller? keyboard?
     -- $6000-$6FFF Expansion 1
@@ -420,7 +421,14 @@ begin
                 oTerminal   => timerTC);
 
     interrupt <= timerTC;
-    dataBus <= timerReg when ((bankEn(4)='0') and (memDriveEn='0')) else "ZZZZZZZZ";
+
+    -- Driving the timer to the databus may not be needed to save a chip
+    timerDriveEn <= '0 when ((bankEn(4)='0') and (memDriveEn='0')) else '1';
+    timerBufComp : entity work.sn74hct244 -- tristate buffer
+    port map(   iEnAN   => timerDriveEn,
+                iEnBN   => timerDriveEn,
+                iData   => timerReg,
+                oData   => dataBus);
     
     ----------------------------------------------------------
     ------        Interrupt Enable Register            -------
