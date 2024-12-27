@@ -104,16 +104,6 @@ begin
     ----------------------------------------------------------
     ------      Memory MUX and Destination decoder     -------
     ----------------------------------------------------------
-    -- IR4,3,2
-    -- 000- [ Y,X]   , AC
-    -- 001- [80,X]   , AC
-    -- 010  [80,00]  , AC
-    -- 011- [80,X]   , X
-    -- 100- [80,X]   , Y
-    -- 101  [ Y,00]  , Y
-    -- 110- [80,X]   , VID
-    -- 111- [ Y,X++] , VID
-    
     modeDecoderComp : entity work.sn74hct138
     port map(   iEn     => operation(7), -- disable during Bcc iInterrupt
                 iEnLo0  => iExecute,
@@ -149,8 +139,8 @@ begin
                        else '1';
 
     oYBufDrive <= busSrc(3) when oPCLoadHi='1' else '1'; -- override during jump instruction
-    oMemDrive  <= busSrc(2);
-    oAccDrive  <= busSrc(1);
+    oAccDrive  <= busSrc(2);
+    oMemDrive  <= busSrc(1);
     oImmDrive  <= busSrc(0);
 
     busDriveName <= "       Y" when oYBufDrive='0' else

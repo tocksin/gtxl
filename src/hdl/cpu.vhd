@@ -84,6 +84,7 @@ architecture ttl of cpu is
     signal memAddr      : slv(15 downto 0);
     signal bankEn       : slv(7 downto 0);
     signal memDriveEn   : sl;
+    signal memOn        : sl;
     
     signal dataRom      : slv(7 downto 0);
     signal ramWrN       : sl;
@@ -119,7 +120,7 @@ begin
     -- Second state: fetch Immediate Data
         -- enable PC counting, enable immediate register, set address MUX to PC
     -- Third state: execute
-        -- disable PC counting, set address MUX to execute
+        -- disable PC counting, set address MUX to instruction execution
 
     -- stateOp is 11 when loading (only on reset), 01 when shifting LSB to MSB
     stateOp(0) <= '1';
@@ -189,7 +190,6 @@ begin
     ----------------------------------------------------------
     ------          Memory Address Selector            -------
     ----------------------------------------------------------
-    -- En = 1 only for interrupt vector
     -- otherwise Sel  = 0 for execute, 1 for fetch
     -- The only user mode is [Y,X] , but Y can also tristate for [80,X]
     
@@ -197,9 +197,8 @@ begin
     --      0      0      0      [ Y, X] -- normal memory access
     --      0      0      1      [PC,PC] -- fetch
     --      0      1      0      [ Y, 0] -- for restoring Y and AC
-    --      1      1      X      [00,00] -- interrupt vector
-    mauEnHi <= '0'; -- 1 during interrupt here
-    mauEnLo <= mauDisableLo; -- need to force to 1 during interrupt and during specific mode
+    mauEnHi <= '0';
+    mauEnLo <= mauDisableLo;
     mauSel <= execute; -- only 1 during program counter access
     
     mau0 : entity work.sn74hct157
@@ -256,25 +255,29 @@ begin
                 iC      => memAddr(14),
                 oY      => bankEn(7 downto 0));     -- active low outputs
 
+    memOn <= instFetch and immFetch and memDriveEn;
     ----------------------------------------------------------
     ------                ROM                          -------
     ----------------------------------------------------------
     romComp : entity work.rom_synth
     port map(   iAddr      => memAddr(13 downto 0),
                 oData      => dataRom);
-    dataBus <= dataRom when (and(bankEn(3 downto 0)) = '0') and ((memDriveEn='0') or (execute='1')) else "ZZZZZZZZ";
+                -- CEn => and(bankEn(3 downto 0)) with diode and
+                -- OEn => memOn
+    dataBus <= dataRom when (and(bankEn(3 downto 0)) = '0') and (memOn='0') else "ZZZZZZZZ";
 
     ----------------------------------------------------------
     ------                RAM                          -------
     ----------------------------------------------------------
     ramComp : entity work.sp_ram_async
     port map(   iWrEnN   => ramWrN,
-                iRamEnN  => '0',
+                iRamEnN  => (not memAddr(15)),
                 iAddr   => memAddr(14 downto 0),
                 iData   => dataBus,
                 oData   => dataRam);
+                -- OEn => memOn
     dataRamDef <= "00000000" when dataRam="UUUUUUUU" else dataRam; -- fix for uninitialized RAM behavior
-    dataBus <= dataRamDef when (memAddr(15) = '1') and ((memDriveEn='0') or (execute='1')) else "ZZZZZZZZ";
+    dataBus <= dataRamDef when (memAddr(15) = '1') and (memOn='0') else "ZZZZZZZZ";
 
     ----------------------------------------------------------
     ------         Instruction Register                -------
@@ -385,7 +388,6 @@ begin
                 oData       => xReg(7 downto 4),
                 oTerminal   => open);
 
-
     ----------------------------------------------------------
     ------        Video Register                       -------
     ----------------------------------------------------------
@@ -404,7 +406,7 @@ begin
     port map(   iClk        => iClk,
                 iRstN       => rstN,
                 iLoadN      => timerLoad,
-                iCntEn      => (not execute),
+                iCntEn      => (not execute),  -- count once per instruction
                 iTCntEn     => '1',
                 iData       => dataBus(3 downto 0),
                 oData       => timerReg(3 downto 0),
@@ -414,7 +416,7 @@ begin
     port map(   iClk        => iClk,
                 iRstN       => rstN,
                 iLoadN      => timerLoad,
-                iCntEn      => (not execute),
+                iCntEn      => (not execute),  -- count once per instruction
                 iTCntEn     => timerTermLo,
                 iData       => dataBus(7 downto 4),
                 oData       => timerReg(7 downto 4),
@@ -423,7 +425,8 @@ begin
     interrupt <= timerTC;
 
     -- Driving the timer to the databus may not be needed to save a chip
-    timerDriveEn <= '0 when ((bankEn(4)='0') and (memDriveEn='0')) else '1';
+    timerDriveEn <= '0' when ((bankEn(4)='0') and (memDriveEn='0')) else '1'; -- could be memOn as well
+    
     timerBufComp : entity work.sn74hct244 -- tristate buffer
     port map(   iEnAN   => timerDriveEn,
                 iEnBN   => timerDriveEn,
@@ -433,13 +436,12 @@ begin
     ----------------------------------------------------------
     ------        Interrupt Enable Register            -------
     ----------------------------------------------------------
-    intEnNext <= '1' when (interrupt='1') or ((intEn='1') and (retI='1')) else '0';
-
-    intStateComp : entity work.sn74hct74
+    intStateComp : entity work.sn74hct109
     port map(   iClk    => iClk,
                 iRstN   => '1',
                 iSetN   => rstN,
-                iD      => intEnNext,
+                iJ      => interrupt,   -- set on interrupt (active high)
+                iKN     => retI,        -- reset on retI (active low)
                 oQ      => intEn,
                 oQN     => open);
 
@@ -449,13 +451,13 @@ begin
     intEnClk <= iClk or intEn;
 
     pcHoldHiComp : entity work.sn74hct574  -- FF with tristate output
-    port map(   iClk    => intEnClk,  -- can't just be intEn.  won't clock every clock.  maybe OR with clock?
+    port map(   iClk    => intEnClk,
                 iEnN    => retI,
                 iData   => pcReg(15 downto 8),
                 oData   => yBus);
 
     pcHoldLoComp : entity work.sn74hct574  -- FF with tristate output
-    port map(   iClk    => intEnClk,  -- can't just be intEn.  won't clock every clock.  maybe OR with clock?
+    port map(   iClk    => intEnClk,
                 iEnN    => retI,
                 iData   => pcReg(7 downto 0),
                 oData   => dataBus);
