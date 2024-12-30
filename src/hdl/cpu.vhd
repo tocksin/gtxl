@@ -41,7 +41,6 @@ architecture ttl of cpu is
     signal immFetch     : sl;
     signal execute      : sl;
     signal pcClear      : sl;
-    signal loadPC       : sl;
     signal pcCount      : sl;
     signal pcLoadLo     : sl;
     signal pcLoadHi     : sl;
@@ -84,7 +83,6 @@ architecture ttl of cpu is
     signal memAddr      : slv(15 downto 0);
     signal bankEn       : slv(7 downto 0);
     signal memDriveEn   : sl;
-    signal memOn        : sl;
     
     signal dataRom      : slv(7 downto 0);
     signal ramWrN       : sl;
@@ -111,7 +109,6 @@ begin
 
     rstN <= not iRst;
 
-    pcClear <= '0' when (iRst='1') or ((interrupt='1') and (execute='0')) else '1';
     ----------------------------------------------------------
     ------          State Machine                      -------
     ----------------------------------------------------------
@@ -142,11 +139,12 @@ begin
     immFetch <= stateN(1);
     execute <= stateN(2);
     
-    pcCount <= execute;
-    loadPC <= '1';
     ----------------------------------------------------------
     ------          Program Counter                    -------
     ----------------------------------------------------------
+    pcClear <= '0' when (rstN='0') or ((interrupt='1') and (execute='0')) else '1';
+    pcCount <= execute;
+
     pc0: entity work.sn74hct161
     port map(   iClk        => iClk,
                 iRstN       => pcClear,
@@ -255,7 +253,6 @@ begin
                 iC      => memAddr(14),
                 oY      => bankEn(7 downto 0));     -- active low outputs
 
-    memOn <= instFetch and immFetch and memDriveEn;
     ----------------------------------------------------------
     ------                ROM                          -------
     ----------------------------------------------------------
@@ -264,7 +261,7 @@ begin
                 oData      => dataRom);
                 -- CEn => and(bankEn(3 downto 0)) with diode and
                 -- OEn => memOn
-    dataBus <= dataRom when (and(bankEn(3 downto 0)) = '0') and (memOn='0') else "ZZZZZZZZ";
+    dataBus <= dataRom when (and(bankEn(3 downto 0)) = '0') and (memDriveEn='0') else "ZZZZZZZZ";
 
     ----------------------------------------------------------
     ------                RAM                          -------
@@ -277,7 +274,7 @@ begin
                 oData   => dataRam);
                 -- OEn => memOn
     dataRamDef <= "00000000" when dataRam="UUUUUUUU" else dataRam; -- fix for uninitialized RAM behavior
-    dataBus <= dataRamDef when (memAddr(15) = '1') and (memOn='0') else "ZZZZZZZZ";
+    dataBus <= dataRamDef when (memAddr(15) = '1') and (memDriveEn='0') else "ZZZZZZZZ";
 
     ----------------------------------------------------------
     ------         Instruction Register                -------
@@ -425,7 +422,7 @@ begin
     interrupt <= timerTC;
 
     -- Driving the timer to the databus may not be needed to save a chip
-    timerDriveEn <= '0' when ((bankEn(4)='0') and (memDriveEn='0')) else '1'; -- could be memOn as well
+    timerDriveEn <= '0' when ((bankEn(4)='0') and (memDriveEn='0')) else '1';
     
     timerBufComp : entity work.sn74hct244 -- tristate buffer
     port map(   iEnAN   => timerDriveEn,

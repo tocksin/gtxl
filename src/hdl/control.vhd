@@ -140,7 +140,7 @@ begin
 
     oYBufDrive <= busSrc(3) when oPCLoadHi='1' else '1'; -- override during jump instruction
     oAccDrive  <= busSrc(2);
-    oMemDrive  <= busSrc(1);
+    oMemDrive  <= busSrc(1) when iExecute='0' else '0'; -- instFetch and immFetch states always enable memory output
     oImmDrive  <= busSrc(0);
 
     busDriveName <= "       Y" when oYBufDrive='0' else
