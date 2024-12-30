@@ -13,12 +13,12 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="78404717fs"></ZoomStartTime>
-      <ZoomEndTime time="93164792fs"></ZoomEndTime>
-      <Cursor1Time time="85432978fs"></Cursor1Time>
+      <ZoomStartTime time="86886308fs"></ZoomStartTime>
+      <ZoomEndTime time="94439081fs"></ZoomEndTime>
+      <Cursor1Time time="90683024fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="128"></NameColumnWidth>
+      <NameColumnWidth column_width="124"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="55" />
@@ -50,10 +50,6 @@
       <obj_property name="ElementShortName">execute</obj_property>
       <obj_property name="ObjectShortName">execute</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/loadPC" type="logic">
-      <obj_property name="ElementShortName">loadPC</obj_property>
-      <obj_property name="ObjectShortName">loadPC</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/PCReg" type="array">
       <obj_property name="ElementShortName">PCReg[15:0]</obj_property>
       <obj_property name="ObjectShortName">PCReg[15:0]</obj_property>
@@ -69,6 +65,7 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/bankEn" type="array">
       <obj_property name="ElementShortName">bankEn[7:0]</obj_property>
       <obj_property name="ObjectShortName">bankEn[7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/dataRom" type="array">
       <obj_property name="ElementShortName">dataRom[7:0]</obj_property>
@@ -217,6 +214,10 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerTC" type="logic">
       <obj_property name="ElementShortName">timerTC</obj_property>
       <obj_property name="ObjectShortName">timerTC</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerLoad" type="logic">
+      <obj_property name="ElementShortName">timerLoad</obj_property>
+      <obj_property name="ObjectShortName">timerLoad</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/rstN" type="logic">
       <obj_property name="ElementShortName">rstN</obj_property>

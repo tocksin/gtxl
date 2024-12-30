@@ -104,6 +104,8 @@ architecture ttl of cpu is
     signal PCHold       : slv(15 downto 0);
 
     signal retI         : sl;
+    signal keyArray     : slv(7 downto 0);
+    signal audioReg     : slv(7 downto 0);
     
 begin
 
@@ -254,7 +256,7 @@ begin
                 oY      => bankEn(7 downto 0));     -- active low outputs
 
     ----------------------------------------------------------
-    ------                ROM                          -------
+    ------                ROM $0000-$3FFF              -------
     ----------------------------------------------------------
     romComp : entity work.rom_synth
     port map(   iAddr      => memAddr(13 downto 0),
@@ -264,7 +266,7 @@ begin
     dataBus <= dataRom when (and(bankEn(3 downto 0)) = '0') and (memDriveEn='0') else "ZZZZZZZZ";
 
     ----------------------------------------------------------
-    ------                RAM                          -------
+    ------                RAM $8000-$FFFF              -------
     ----------------------------------------------------------
     ramComp : entity work.sp_ram_async
     port map(   iWrEnN   => ramWrN,
@@ -395,7 +397,7 @@ begin
                 oData   => vidReg);
     
     ----------------------------------------------------------
-    ------        Timer                                -------
+    ------        Timer  $4000-$4FFF                   -------
     ----------------------------------------------------------
     timerLoad <= '0' when (execute='0') and (bankEn(4)='0') and (ramWrN='0') else '1';
     
@@ -459,4 +461,34 @@ begin
                 iData   => pcReg(7 downto 0),
                 oData   => dataBus);
 
+    ----------------------------------------------------------
+    ------        Keyboard  $5000-$5FFF                -------
+    ----------------------------------------------------------
+    -- Address lines 8 downto 0 to keyboard array (11 downto 0 is available)
+    --  keyArray 6 downto 0 is from keyboard
+    --  keyArray 7 from serial port input
+    keyArray <= "11111111";
+    
+    keyBufComp : entity work.sn74hct244 -- tristate buffer
+    port map(   iEnAN   => bankEn(5),
+                iEnBN   => bankEn(5),
+                iData   => keyArray,
+                oData   => dataBus);
+
+    ----------------------------------------------------------
+    ------        Audio                                -------
+    ----------------------------------------------------------
+    -- Keep writing access to XOUT with video output?
+    --   or switch to memory bus access?
+    -- Lower 4 bits is audio left (or mono) - goes to tip
+    -- Upper 4 bits is audio right - goes to first ring
+    -- Upper 4 bits can also go to LEDs
+    -- Ground is second ring
+    -- Mic is sleeve.  Maybe have jumpers to select second audio input connector, or from mic sleeve.
+    audioComp : entity work.sn74hct377  -- FF with load enable
+    port map(   iClk    => vidReg(6),
+                iLoadN  => '0',
+                iData   => acReg,
+                oData   => audioReg);
+    
 end architecture ttl;
