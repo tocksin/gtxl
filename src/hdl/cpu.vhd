@@ -291,28 +291,28 @@ begin
     ------         Instruction Decoder                 -------
     ----------------------------------------------------------
     controlComp: entity work.control
-    port map(   iClk   => iClk,
-                iInst  => instReg,
-                iCarry => aluCarry,
-                iSign  => acReg(7),
-                iExecute => execute,
-                iInterrupt => interrupt,
-                oAluOp => aluOp,
-                oXLoad => xLoad,
-                oYLoad => yLoad,
-                oIncX  => xCount,
-                oPCLoadLo => pcLoadLo,
-                oPCLoadHi => pcLoadHi,
-                oacLoad   => acLoad,
-                oVidLoad => vidLoad,
-                oMemDrive => memDriveEn,
-                oImmDrive => immDriveEn,
-                oAccDrive => acDriveEn,
-                oYBusDrive => yBusDriveEn,
-                oYBufDrive => yBufDriveEn,
-                oRamWrN => ramWrN,
-                oMauLoDis => mauDisableLo,
-                oRetI   => retI);
+    port map(   iClk        => iClk,
+                iInst       => instReg,
+                iCarry      => aluCarry,
+                iSign       => acReg(7),
+                iExecute    => execute,
+                iInterrupt  => interrupt,
+                oAluOp      => aluOp,
+                oXLoad      => xLoad,
+                oYLoad      => yLoad,
+                oIncX       => xCount,
+                oPCLoadLo   => pcLoadLo,
+                oPCLoadHi   => pcLoadHi,
+                oacLoad     => acLoad,
+                oVidLoad    => vidLoad,
+                oMemDrive   => memDriveEn,
+                oImmDrive   => immDriveEn,
+                oAccDrive   => acDriveEn,
+                oYBusDrive  => yBusDriveEn,
+                oYBufDrive  => yBufDriveEn,
+                oRamWrN     => ramWrN,
+                oMauLoDis   => mauDisableLo,
+                oRetI       => retI);
 
     ----------------------------------------------------------
     ------         Immediate Data Register             -------
@@ -327,11 +327,11 @@ begin
     ------         Arithmetic Logic Unit               -------
     ----------------------------------------------------------
     aluComp : entity work.alu
-    port map(   iDataA      => dataBus,
-                iDataB      => acReg,
-                iOp         => aluOp,
-                oData       => aluData,
-                oCarry      => aluCarry);
+    port map(   iDataA  => dataBus,
+                iDataB  => acReg,
+                iOp     => aluOp,
+                oData   => aluData,
+                oCarry  => aluCarry);
 
     ----------------------------------------------------------
     ------         Accumulator Register and Buffer     -------
@@ -464,8 +464,9 @@ begin
     ----------------------------------------------------------
     ------        Keyboard  $5000-$5FFF                -------
     ----------------------------------------------------------
-    -- Address lines 8 downto 0 to keyboard array (11 downto 0 is available)
-    --  keyArray 6 downto 0 is from keyboard
+    -- Address lines 10 downto 0 to keyboard array (11 downto 0 is available)
+    --  keyArray 5 downto 0 from keyboard
+    --  keyArray 6 from audio input
     --  keyArray 7 from serial port input
     keyArray <= "11111111";
     
@@ -476,7 +477,7 @@ begin
                 oData   => dataBus);
 
     ----------------------------------------------------------
-    ------        Audio                                -------
+    ------        Audio Out                            -------
     ----------------------------------------------------------
     -- Keep writing access to XOUT with video output?
     --   or switch to memory bus access?

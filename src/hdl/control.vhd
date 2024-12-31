@@ -113,8 +113,8 @@ begin
                 iC      => iInst(4),
                 oY      => mode);
 
-    modeName <= "[80,X]  , AC" when mode="11111110" else  --Y Bus on
-                "[ Y,X]  , AC" when mode="11111101" else  --Y Bus off
+    modeName <= "[80,X]  , AC" when mode="11111110" else  --Y Bus off
+                "[ Y,X]  , AC" when mode="11111101" else  --Y Bus on
                 "[80,00] , AC" when mode="11111011" else  --Y Bus off
                 "[80,X]  ,  X" when mode="11110111" else  --Y Bus off
                 "[80,X]  ,  Y" when mode="11101111" else  --Y Bus off
@@ -123,14 +123,6 @@ begin
                 "[ Y,X++],VID" when mode="01111111" else  --Y Bus on
                 "Disabled,Bcc" when mode="11111111" else
                 "ERROR   ,ERR";
-    
-    ----------------------------------------------------------
-    ------          Data Bus Source Selector           -------
-    ----------------------------------------------------------
-    sourceBus : entity work.sn74hct139
-    port map(   iEnN     => iExecute,
-                iData    => iInst(1 downto 0),
-                oData    => busSrc);
 
     oYBusDrive <= '0' when (modeName="[ Y,X]  , AC"
                          or modeName="[ Y,00] ,  Y"
@@ -138,21 +130,6 @@ begin
                         and oRetI='1'
                        else '1';
 
-    oYBufDrive <= busSrc(3) when oPCLoadHi='1' else '1'; -- override during jump instruction
-    oAccDrive  <= busSrc(2);
-    oMemDrive  <= busSrc(1) when iExecute='0' else '0'; -- instFetch and immFetch states always enable memory output
-    oImmDrive  <= busSrc(0);
-
-    busDriveName <= "       Y" when oYBufDrive='0' else
-                    "     MEM" when oMemDrive='0' else
-                    "      AC" when oAccDrive='0' else
-                    "       D" when oImmDrive='0' else
-                    "     off" when busSrc="0000" else
-                    "     ERR";
-    
-    fullName <= opName & modeName(1 to 8) & modeName(9 to 12) when busDriveName = "     MEM" else
-                opName & busDriveName & modeName(9 to 12);
-    
     oXLoad    <= '0' when  modeName="[80,X]  ,  X" else '1';
     
     oYLoad    <= '0' when  modeName="[80,X]  ,  Y" or 
@@ -170,6 +147,29 @@ begin
     oMauLoDis <= '1' when  modeName="[80,00] , AC" or 
                            modeName="[ Y,00] ,  Y" else '0';
     
+    ----------------------------------------------------------
+    ------          Data Bus Source Selector           -------
+    ----------------------------------------------------------
+    sourceBus : entity work.sn74hct139
+    port map(   iEnN     => iExecute,
+                iData    => iInst(1 downto 0),
+                oData    => busSrc);
+
+    oYBufDrive <= busSrc(3) when oPCLoadHi='1' else '1'; -- override during jump instruction
+    oAccDrive  <= busSrc(2);
+    oMemDrive  <= busSrc(1) when iExecute='0' else '0'; -- instFetch and immFetch states always enable memory output
+    oImmDrive  <= busSrc(0);
+
+    busDriveName <= "       Y" when oYBufDrive='0' else
+                    "     MEM" when oMemDrive='0' else
+                    "      AC" when oAccDrive='0' else
+                    "       D" when oImmDrive='0' else
+                    "     off" when busSrc="0000" else
+                    "     ERR";
+    
+    fullName <= opName & modeName(1 to 8) & modeName(9 to 12) when busDriveName = "     MEM" else
+                opName & busDriveName & modeName(9 to 12);
+
     oRamWrN <= '0' when (iClk='0') and (opName=" ST") and (oMemDrive='1') else '1';
     
     ----------------------------------------------------------
