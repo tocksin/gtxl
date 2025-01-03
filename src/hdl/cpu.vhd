@@ -52,6 +52,7 @@ architecture ttl of cpu is
     signal instReg      : slv(7 downto 0);
     signal immEn        : sl;
     signal immDriveEn   : sl;
+    signal immReg       : slv(7 downto 0);
     
     signal aluOp        : slv(4 downto 0);
     signal aluData      : slv(7 downto 0);
@@ -71,6 +72,8 @@ architecture ttl of cpu is
     signal xCount       : sl;
     signal xLoad        : sl;
     signal xTermLo      : sl;
+    signal xBusSel      : sl;
+    signal xBus         : slv(7 downto 0);
     
     signal vidLoad      : sl;
     signal vidReg       : slv(7 downto 0) := x"00";
@@ -190,26 +193,25 @@ begin
     ----------------------------------------------------------
     ------          Memory Address Selector            -------
     ----------------------------------------------------------
-    -- otherwise Sel  = 0 for execute, 1 for fetch
-    -- The only user mode is [Y,X] , but Y can also tristate for [80,X]
-    
     --      EnHi   EnLo   Sel    Memory access
-    --      0      0      0      [ Y, X] -- normal memory access
+    --      0      0      0      [ Ybus, Xbus] -- normal memory access
     --      0      0      1      [PC,PC] -- fetch
-    --      0      1      0      [ Y, 0] -- for restoring Y and AC
+    -- Ybus can be either Y register or 0x80
+    -- Xbus can be either X register or D register
+    
     mauEnHi <= '0';
-    mauEnLo <= mauDisableLo;
+    mauEnLo <= '0';
     mauSel <= execute; -- only 1 during program counter access
     
     mau0 : entity work.sn74hct157
-    port map(   iA          => xReg(3 downto 0),
+    port map(   iA          => xBus(3 downto 0),
                 iB          => pcReg(3 downto 0),
                 iEnableN    => mauEnLo,
                 iSelect     => mauSel,
                 oY          => memAddr(3 downto 0));
 
     mau1 : entity work.sn74hct157
-    port map(   iA          => xReg(7 downto 4),
+    port map(   iA          => xBus(7 downto 4),
                 iB          => pcReg(7 downto 4),
                 iEnableN    => mauEnLo,
                 iSelect     => mauSel,
@@ -310,17 +312,23 @@ begin
                 oAccDrive   => acDriveEn,
                 oYBusDrive  => yBusDriveEn,
                 oYBufDrive  => yBufDriveEn,
+                oXBusSel    => xBusSel,
                 oRamWrN     => ramWrN,
-                oMauLoDis   => mauDisableLo,
                 oRetI       => retI);
 
     ----------------------------------------------------------
     ------         Immediate Data Register             -------
     ----------------------------------------------------------
-    immeComp : entity work.sn74hct574  -- FF with tristate output
-    port map(   iClk    => immFetch,
-                iEnN    => immDriveEn,
+    immeComp : entity work.sn74hct377  -- FF with tristate output
+    port map(   iClk    => iClk,
+                iLoadN  => immFetch,
                 iData   => dataBus,
+                oData   => immReg);
+
+    immBufComp : entity work.sn74hct244 -- tristate buffer
+    port map(   iEnAN   => immDriveEn,
+                iEnBN   => immDriveEn,
+                iData   => immReg,
                 oData   => dataBus);
 
     ----------------------------------------------------------
@@ -386,6 +394,24 @@ begin
                 iData       => aluData(7 downto 4),
                 oData       => xReg(7 downto 4),
                 oTerminal   => open);
+
+    ----------------------------------------------------------
+    ------        X Bus                                -------
+    ----------------------------------------------------------
+    -- 0 for X, 1 for D
+    xBusLoComp : entity work.sn74hct157
+    port map(   iA          => xReg(3 downto 0),
+                iB          => immReg(3 downto 0),
+                iEnableN    => '0',
+                iSelect     => xBusSel,
+                oY          => xBus(3 downto 0));
+
+    xBusHiComp : entity work.sn74hct157
+    port map(   iA          => xReg(7 downto 4),
+                iB          => immReg(7 downto 4),
+                iEnableN    => '0',
+                iSelect     => xBusSel,
+                oY          => xBus(7 downto 4));
 
     ----------------------------------------------------------
     ------        Video Register                       -------

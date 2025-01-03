@@ -44,8 +44,8 @@ entity control is
             oAccDrive   : out sl;
             oYBufDrive  : out sl;
             oYBusDrive  : out sl;
+            oXBusSel    : out sl;
             oRamWrN     : out sl;
-            oMauLoDis   : out sl;
             oRetI       : out sl);
 end entity control;
 
@@ -112,40 +112,41 @@ begin
                 iB      => iInst(3),
                 iC      => iInst(4),
                 oY      => mode);
-
-    modeName <= "[80,X]  , AC" when mode="11111110" else  --Y Bus off
-                "[ Y,X]  , AC" when mode="11111101" else  --Y Bus on
-                "[80,00] , AC" when mode="11111011" else  --Y Bus off
-                "[80,X]  ,  X" when mode="11110111" else  --Y Bus off
-                "[80,X]  ,  Y" when mode="11101111" else  --Y Bus off
-                "[ Y,00] ,  Y" when mode="11011111" else  --Y Bus on
-                "[80,X]  ,VID" when mode="10111111" else  --Y Bus off
+                
+    modeName <= "[80,D]  , AC" when mode="11111110" else  --Y Bus off
+                "[80,X]  , AC" when mode="11111101" else  --Y Bus on
+                "[ Y,D]  , AC" when mode="11111011" else  --Y Bus off
+                "[ Y,X]  , AC" when mode="11110111" else  --Y Bus off
+                "[80,D]  ,  X" when mode="11101111" else  --Y Bus off
+                "[80,D]  ,  Y" when mode="11011111" else  --Y Bus on
+                "[80,D]  ,VID" when mode="10111111" else  --Y Bus off
                 "[ Y,X++],VID" when mode="01111111" else  --Y Bus on
                 "Disabled,Bcc" when mode="11111111" else
                 "ERROR   ,ERR";
 
-    oYBusDrive <= '0' when (modeName="[ Y,X]  , AC"
-                         or modeName="[ Y,00] ,  Y"
+    oYBusDrive <= '0' when (modeName="[ Y,D]  , AC"
+                         or modeName="[ Y,X]  , AC"
                          or modeName="[ Y,X++],VID")
                         and oRetI='1'
                        else '1';
+                       
+    oXBusSel <= '0' when (modeName="[80,X]  , AC" or
+                          modeName="[ Y,X]  , AC" or
+                          modeName="[ Y,X++],VID") else '1';
 
-    oXLoad    <= '0' when  modeName="[80,X]  ,  X" else '1';
+    oXLoad    <= '0' when  modeName="[80,D]  ,  X" else '1';
     
-    oYLoad    <= '0' when  modeName="[80,X]  ,  Y" or 
-                           modeName="[ Y,00] ,  Y" else '1';
+    oYLoad    <= '0' when  modeName="[80,D]  ,  Y" else '1';
 
-    oAcLoad   <= '0' when (modeName="[ Y,X]  , AC" or 
+    oAcLoad   <= '0' when (modeName="[80,D]  , AC" or 
                            modeName="[80,X]  , AC" or
-                           modeName="[80,00] , AC")  and opName/=" ST" else '1';
+                           modeName="[ Y,D]  , AC" or 
+                           modeName="[ Y,X]  , AC" )  and opName/=" ST" else '1';
 
-    oVidLoad  <= '0' when (modeName="[80,X]  ,VID" or 
+    oVidLoad  <= '0' when (modeName="[80,D]  ,VID" or 
                            modeName="[ Y,X++],VID") and opName/=" ST" else '1';
     
     oIncX     <= '1' when  modeName="[ Y,X++],VID" else '0';
-    
-    oMauLoDis <= '1' when  modeName="[80,00] , AC" or 
-                           modeName="[ Y,00] ,  Y" else '0';
     
     ----------------------------------------------------------
     ------          Data Bus Source Selector           -------

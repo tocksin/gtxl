@@ -33,46 +33,37 @@ architecture rtl of rom_synth is
     type rom_type is array (0 to (2**iAddr'length)-1) of std_logic_vector(oData'range);
     signal rom : rom_type := ( 
 
- 0 =>x"CA",  1=>x"00", -- st [80,00],AC AC-- store AC to 0x8000
- 2 =>x"07",  3=>x"00", -- ld [Y,X],AC Y
- 4 =>x"10",  5=>x"81", -- ld [80,X],Y D
- 6 =>x"D6",  7=>x"00", -- st [Y,00],Y AC-- store Y to 0x8100
- 8 =>x"10",  9=>x"3F", -- ld [80,X],Y D
- 10 =>x"05",  11=>x"00", -- ld [Y,X],AC MEM-- load from ROM table at 0x3F00-3FFF
- 12 =>x"0C",  13=>x"05", -- ld [80,X],X D
- 14 =>x"C2",  15=>x"00", -- st [80,X],AC AC-- store X to 0x8005
- 16 =>x"10",  17=>x"40", -- ld [80,X],Y D-- Set Y to 0x4000
- 18 =>x"C4",  19=>x"38", -- st [Y,X],AC D-- Load timer with 200
- 20 =>x"0C",  21=>x"01", -- ld [80,X],X D--Load X with BOOTCNT (0x01)
- 22 =>x"00",  23=>x"37", -- ld [80,X],AC D--Load AC with 55
- 24 =>x"61",  25=>x"00", -- xor [80,X],AC MEM--XOR compare 55 with 0x8001
- 26 =>x"F0",  27=>x"28", -- beq 0 D--branch if equal
- 28 =>x"00",  29=>x"01", -- ld [80,X],AC D-- load AC with x01
- 30 =>x"61",  31=>x"00", -- xor [80,X],AC MEM--XOR compare x01 with 0x8001
- 32 =>x"F0",  33=>x"3A", -- beq 0 D-- branch if equal
- 34 =>x"00",  35=>x"01", -- ld [80,X],AC D
- 36 =>x"C2",  37=>x"00", -- st [80,X],AC AC--store 0x01 to BOOTCNT
- 38 =>x"E3",  39=>x"00", -- reti 0 0-- reti to set interrupt enbale
- 40 =>x"00",  41=>x"00", -- ld [80,X],AC D-- clear registers-- temporary video handler vector
- 42 =>x"0C",  43=>x"00", -- ld [80,X],X D
- 44 =>x"10",  45=>x"00", -- ld [80,X],Y D-- restore registers from memory
- 46 =>x"10",  47=>x"81", -- ld [80,X],Y D-- load Y from 0x8100
- 48 =>x"15",  49=>x"00", -- ld [Y,00],Y MEM
- 50 =>x"0C",  51=>x"05", -- ld [80,X],X D-- load X from 0x8005
- 52 =>x"0D",  53=>x"00", -- ld [80,X],X MEM
- 54 =>x"09",  55=>x"00", -- ld [80,00],AC MEM-- load AC from 0x8000
- 56 =>x"E3",  57=>x"00", -- reti 0 0
- 58 =>x"00",  59=>x"37", -- ld [80,X],AC D-- load BOOTCNT with 55-- temporary cold boot vector
- 60 =>x"C2",  61=>x"00", -- st [80,X],AC AC-- end of booting
- 62 =>x"0C",  63=>x"32", -- ld [80,X],X D-- test program:store value to memory, load it back, add to it, repeat
- 64 =>x"00",  65=>x"00", -- ld [80,X],AC D--initialize AC with 0
- 66 =>x"C2",  67=>x"00", -- st [80,X],AC AC--store value
- 68 =>x"01",  69=>x"00", -- ld [80,X],AC MEM--load value
- 70 =>x"80",  71=>x"01", -- add [80,X],AC D--add 1
- 72 =>x"10",  73=>x"80", -- ld [80,X],Y D-- setup Y for memory addressing
- 74 =>x"1E",  75=>x"00", -- ld [Y,X++],VID AC-- load result to VID output incrementing X for testing
- 76 =>x"0C",  77=>x"32", -- ld [80,X],X D-- reload X
- 78 =>x"FC",  79=>x"42", -- bra 0 D-- branch back
+ 0 =>x"C2",  1=>x"00", -- st [80,D] AC-- store AC to 0x8000-- save register states
+ 2 =>x"C3",  3=>x"01", -- st [80,D] Y-- store Y  to 0x8001
+ 4 =>x"14",  5=>x"3F", -- ld Y D
+ 6 =>x"0D",  7=>x"00", -- ld [Y,X],AC MEM-- load from ROM table at 0x3F00-3FFF
+ 8 =>x"C2",  9=>x"02", -- st [80,D] AC-- store X to 0x8002
+ 10 =>x"14",  11=>x"40", -- ld Y D-- Set Y to 0x4000--reload timer
+ 12 =>x"CC",  13=>x"38", -- st [Y,X] D-- Load timer with 200
+ 14 =>x"01",  15=>x"03", -- ld [80,D] MEM-- Load BOOTCNT--check if booting finished
+ 16 =>x"60",  17=>x"37", -- xor AC D--XOR compare 55 with BOOTCNT
+ 18 =>x"F0",  19=>x"20", -- beq 0 D--branch if equal to VIDEO_HANDLER
+ 20 =>x"01",  21=>x"03", -- ld [80,D] MEM-- Load BOOTCNT
+ 22 =>x"60",  23=>x"01", -- xor AC D-- xor compare with 1--check if first boot
+ 24 =>x"F0",  25=>x"2E", -- beq 0 D-- branch to BOOT_VECTOR if equal
+ 26 =>x"00",  27=>x"01", -- ld AC D--first boot
+ 28 =>x"C2",  29=>x"03", -- st [80,D] AC--store 0x01 to BOOTCNT
+ 30 =>x"E3",  31=>x"00", -- reti 0 0-- reti to set interrupt enbale-- reti to clear interrupt disable for normal booting
+ 32 =>x"00",  33=>x"00", -- ld AC D-- clear registers-- VIDEO_HANDLER
+ 34 =>x"10",  35=>x"00", -- ld X D-- restore registers from memory--restore registers
+ 36 =>x"14",  37=>x"00", -- ld Y D
+ 38 =>x"01",  39=>x"00", -- ld [80,D],AC MEM--load AC
+ 40 =>x"11",  41=>x"01", -- ld [80,D],X MEM-- load X
+ 42 =>x"15",  43=>x"02", -- ld [80,D],Y MEM-- load Y
+ 44 =>x"E3",  45=>x"00", -- reti 0 0-- return from interrupt
+ 46 =>x"00",  47=>x"37", -- ld AC D-- BOOT_VECTOR
+ 48 =>x"C2",  49=>x"03", -- st [80,D] AC-- store 55 to  BOOTCNT
+ 50 =>x"00",  51=>x"00", -- ld AC D--initialize AC with 0-- main test program:store value to memory, load it back, add to it, repeat
+ 52 =>x"C2",  53=>x"04", -- st [80,D] AC--store value-- MAIN_LOOP
+ 54 =>x"01",  55=>x"04", -- ld [80,D] MEM--load value
+ 56 =>x"80",  57=>x"01", -- add AC D--add 1
+ 58 =>x"1A",  59=>x"00", -- ld VID AC-- copy result to VID output incrementing X for testing
+ 60 =>x"FC",  61=>x"34", -- bra 0 D-- branch back to MAIN_LOOP
 
     ----------------------------------------------------------
     ------        X Lookup Table                       -------
