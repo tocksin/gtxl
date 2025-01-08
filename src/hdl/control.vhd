@@ -146,8 +146,9 @@ begin
     oVidLoad  <= '0' when (modeName="[80,D]  ,VID" or 
                            modeName="[ Y,X++],VID") and opName/=" ST" else '1';
     
-    oIncX     <= '1' when  modeName="[ Y,X++],VID" else '0';
-    
+--    oIncX     <= '1' when  modeName="[ Y,X++],VID" else '0';
+      oIncX     <= not iExecute;
+  
     ----------------------------------------------------------
     ------          Data Bus Source Selector           -------
     ----------------------------------------------------------

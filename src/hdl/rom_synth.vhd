@@ -35,11 +35,11 @@ architecture rtl of rom_synth is
 
  0 =>x"C2",  1=>x"00", -- st [80,D] AC-- store AC to 0x8000-- save register states
  2 =>x"C3",  3=>x"01", -- st [80,D] Y-- store Y  to 0x8001
- 4 =>x"14",  5=>x"3F", -- ld Y D
- 6 =>x"0D",  7=>x"00", -- ld [Y,X],AC MEM-- load from ROM table at 0x3F00-3FFF
- 8 =>x"C2",  9=>x"02", -- st [80,D] AC-- store X to 0x8002
- 10 =>x"14",  11=>x"40", -- ld Y D-- Set Y to 0x4000--reload timer
- 12 =>x"CC",  13=>x"38", -- st [Y,X] D-- Load timer with 200
+ 4 =>x"10",  5=>x"38", -- ld X D-- Set X to 0x55--reload timer
+ 6 =>x"02",  7=>x"00", -- nop 0 0
+ 8 =>x"02",  9=>x"00", -- nop 0 0
+ 10 =>x"02",  11=>x"00", -- nop 0 0
+ 12 =>x"02",  13=>x"00", -- nop 0 0
  14 =>x"01",  15=>x"03", -- ld [80,D] MEM-- Load BOOTCNT--check if booting finished
  16 =>x"60",  17=>x"37", -- xor AC D--XOR compare 55 with BOOTCNT
  18 =>x"F0",  19=>x"20", -- beq 0 D--branch if equal to VIDEO_HANDLER
@@ -50,10 +50,10 @@ architecture rtl of rom_synth is
  28 =>x"C2",  29=>x"03", -- st [80,D] AC--store 0x01 to BOOTCNT
  30 =>x"E3",  31=>x"00", -- reti 0 0-- reti to set interrupt enbale-- reti to clear interrupt disable for normal booting
  32 =>x"00",  33=>x"00", -- ld AC D-- clear registers-- VIDEO_HANDLER
- 34 =>x"10",  35=>x"00", -- ld X D-- restore registers from memory--restore registers
+ 34 =>x"02",  35=>x"00", -- nop 0 0
  36 =>x"14",  37=>x"00", -- ld Y D
- 38 =>x"01",  39=>x"00", -- ld [80,D],AC MEM--load AC
- 40 =>x"11",  41=>x"01", -- ld [80,D],X MEM-- load X
+ 38 =>x"01",  39=>x"00", -- ld [80,D],AC MEM--load AC--restore registers
+ 40 =>x"02",  41=>x"00", -- nop 0 0
  42 =>x"15",  43=>x"02", -- ld [80,D],Y MEM-- load Y
  44 =>x"E3",  45=>x"00", -- reti 0 0-- return from interrupt
  46 =>x"00",  47=>x"37", -- ld AC D-- BOOT_VECTOR

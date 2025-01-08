@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="7052684fs"></ZoomEndTime>
-      <Cursor1Time time="0fs"></Cursor1Time>
+      <ZoomStartTime time="77532600fs"></ZoomStartTime>
+      <ZoomEndTime time="91265284fs"></ZoomEndTime>
+      <Cursor1Time time="1000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="149"></NameColumnWidth>
-      <ValueColumnWidth column_width="101"></ValueColumnWidth>
+      <ValueColumnWidth column_width="97"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="56" />
+   <WVObjectSize size="52" />
    <wvobject fp_name="/tb_basys_demo/clkSys" type="logic">
       <obj_property name="ElementShortName">clkSys</obj_property>
       <obj_property name="ObjectShortName">clkSys</obj_property>
@@ -209,18 +209,6 @@
       <obj_property name="ElementShortName">oPCLoadHi</obj_property>
       <obj_property name="ObjectShortName">oPCLoadHi</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerReg" type="array">
-      <obj_property name="ElementShortName">timerReg[7:0]</obj_property>
-      <obj_property name="ObjectShortName">timerReg[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerTC" type="logic">
-      <obj_property name="ElementShortName">timerTC</obj_property>
-      <obj_property name="ObjectShortName">timerTC</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerLoad" type="logic">
-      <obj_property name="ElementShortName">timerLoad</obj_property>
-      <obj_property name="ObjectShortName">timerLoad</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/rstN" type="logic">
       <obj_property name="ElementShortName">rstN</obj_property>
       <obj_property name="ObjectShortName">rstN</obj_property>
@@ -228,10 +216,6 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/interrupt" type="logic">
       <obj_property name="ElementShortName">interrupt</obj_property>
       <obj_property name="ObjectShortName">interrupt</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/timerHiComp/oTerminal" type="logic">
-      <obj_property name="ElementShortName">oTerminal</obj_property>
-      <obj_property name="ObjectShortName">oTerminal</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/intEn" type="logic">
       <obj_property name="ElementShortName">intEn</obj_property>

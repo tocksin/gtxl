@@ -147,7 +147,7 @@ begin
     ----------------------------------------------------------
     ------          Program Counter                    -------
     ----------------------------------------------------------
-    pcClear <= '0' when (rstN='0') or ((interrupt='1') and (execute='0')) else '1';
+    pcClear <= '0' when (rstN='0') or (((interrupt='1') and (execute='0') and iClk='0')) else '1';
     pcCount <= execute;
 
     pc0: entity work.sn74hct161
@@ -243,7 +243,7 @@ begin
     -- $1000-$1FFF ROM
     -- $2000-$2FFF ROM
     -- $3000-$3FFF ROM
-    -- $4000-$4FFF Timer
+    -- $4000-$4FFF 
     -- $5000-$5FFF I/O - shift register for controller? keyboard?
     -- $6000-$6FFF Expansion 1
     -- $7000-$7FFF Expansion 2
@@ -393,7 +393,7 @@ begin
                 iTCntEn     => xTermLo,
                 iData       => aluData(7 downto 4),
                 oData       => xReg(7 downto 4),
-                oTerminal   => open);
+                oTerminal   => interrupt);
 
     ----------------------------------------------------------
     ------        X Bus                                -------
@@ -425,38 +425,38 @@ begin
     ----------------------------------------------------------
     ------        Timer  $4000-$4FFF                   -------
     ----------------------------------------------------------
-    timerLoad <= '0' when (execute='0') and (bankEn(4)='0') and (ramWrN='0') else '1';
+    -- timerLoad <= '0' when (execute='0') and (bankEn(4)='0') and (ramWrN='0') else '1';
     
-    timerLoComp: entity work.sn74hct161
-    port map(   iClk        => iClk,
-                iRstN       => rstN,
-                iLoadN      => timerLoad,
-                iCntEn      => (not execute),  -- count once per instruction
-                iTCntEn     => '1',
-                iData       => dataBus(3 downto 0),
-                oData       => timerReg(3 downto 0),
-                oTerminal   => timerTermLo);
+    -- timerLoComp: entity work.sn74hct161
+    -- port map(   iClk        => iClk,
+                -- iRstN       => rstN,
+                -- iLoadN      => timerLoad,
+                -- iCntEn      => (not execute),  -- count once per instruction
+                -- iTCntEn     => '1',
+                -- iData       => dataBus(3 downto 0),
+                -- oData       => timerReg(3 downto 0),
+                -- oTerminal   => timerTermLo);
 
-    timerHiComp: entity work.sn74hct161
-    port map(   iClk        => iClk,
-                iRstN       => rstN,
-                iLoadN      => timerLoad,
-                iCntEn      => (not execute),  -- count once per instruction
-                iTCntEn     => timerTermLo,
-                iData       => dataBus(7 downto 4),
-                oData       => timerReg(7 downto 4),
-                oTerminal   => timerTC);
+    -- timerHiComp: entity work.sn74hct161
+    -- port map(   iClk        => iClk,
+                -- iRstN       => rstN,
+                -- iLoadN      => timerLoad,
+                -- iCntEn      => (not execute),  -- count once per instruction
+                -- iTCntEn     => timerTermLo,
+                -- iData       => dataBus(7 downto 4),
+                -- oData       => timerReg(7 downto 4),
+                -- oTerminal   => timerTC);
 
-    interrupt <= timerTC;
+    -- interrupt <= timerTC;
 
-    -- Driving the timer to the databus may not be needed to save a chip
-    timerDriveEn <= '0' when ((bankEn(4)='0') and (memDriveEn='0')) else '1';
+    -- -- Driving the timer to the databus may not be needed to save a chip
+    -- timerDriveEn <= '0' when ((bankEn(4)='0') and (memDriveEn='0')) else '1';
     
-    timerBufComp : entity work.sn74hct244 -- tristate buffer
-    port map(   iEnAN   => timerDriveEn,
-                iEnBN   => timerDriveEn,
-                iData   => timerReg,
-                oData   => dataBus);
+    -- timerBufComp : entity work.sn74hct244 -- tristate buffer
+    -- port map(   iEnAN   => timerDriveEn,
+                -- iEnBN   => timerDriveEn,
+                -- iData   => timerReg,
+                -- oData   => dataBus);
     
     ----------------------------------------------------------
     ------        Interrupt Enable Register            -------
@@ -513,8 +513,8 @@ begin
     -- Ground is second ring
     -- Mic is sleeve.  Maybe have jumpers to select second audio input connector, or from mic sleeve.
     audioComp : entity work.sn74hct377  -- FF with load enable
-    port map(   iClk    => vidReg(6),
-                iLoadN  => '0',
+    port map(   iClk    => iClk,
+                iLoadN  => (bankEn(4) and ramWrN),
                 iData   => acReg,
                 oData   => audioReg);
     
