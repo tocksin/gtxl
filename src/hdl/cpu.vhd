@@ -72,8 +72,6 @@ architecture ttl of cpu is
     signal xCount       : sl;
     signal xLoad        : sl;
     signal xTermLo      : sl;
-    signal xBusSel      : sl;
-    signal xBus         : slv(7 downto 0);
     
     signal vidLoad      : sl;
     signal vidReg       : slv(7 downto 0) := x"00";
@@ -93,22 +91,16 @@ architecture ttl of cpu is
     signal dataRamDef   : slv(7 downto 0);
     signal dataBus      : slv(7 downto 0);
 
-    signal timerLoad    : sl;
-    signal timerTermLo  : sl;
-    signal timerReg     : slv(7 downto 0) := x"00";
-    signal timerTC      : sl;
-    signal timerDriveEn : sl;
     signal interrupt    : sl;
-    signal intEn        : sl := '1';
-    signal intClear     : sl;
-    signal intEnClk     : sl;
-    signal intEnNext    : sl;
     
     signal PCHold       : slv(15 downto 0);
 
     signal retI         : sl;
     signal keyArray     : slv(7 downto 0);
     signal audioReg     : slv(7 downto 0);
+
+    signal xMemEn       : sl;
+    signal immMemEn     : sl;
     
 begin
 
@@ -199,35 +191,39 @@ begin
     -- Ybus can be either Y register or 0x80
     -- Xbus can be either X register or D register
     
-    mauEnHi <= '0';
-    mauEnLo <= '0';
     mauSel <= execute; -- only 1 during program counter access
     
-    mau0 : entity work.sn74hct157
-    port map(   iA          => xBus(3 downto 0),
-                iB          => pcReg(3 downto 0),
-                iEnableN    => mauEnLo,
-                iSelect     => mauSel,
-                oY          => memAddr(3 downto 0));
+    mau0 : entity work.sn74hct244 -- tristate buffer
+    port map(   iEnAN   => immMemEn,
+                iEnBN   => immMemEn,
+                iData   => immReg,
+                oData   => memAddr(7 downto 0));
 
-    mau1 : entity work.sn74hct157
-    port map(   iA          => xBus(7 downto 4),
-                iB          => pcReg(7 downto 4),
-                iEnableN    => mauEnLo,
-                iSelect     => mauSel,
-                oY          => memAddr(7 downto 4));
+    mau1 : entity work.sn74hct244 -- tristate buffer
+    port map(   iEnAN   => xMemEn,
+                iEnBN   => xMemEn,
+                iData   => xReg,
+                oData   => memAddr(7 downto 0));
 
-    mau2 : entity work.sn74hct157
+    mau2 : entity work.sn74hct244
+    port map(   iEnAN   => (not execute),
+                iEnBN   => (not execute),
+                iData   => pcReg(7 downto 0),
+                oData   => memAddr(7 downto 0));
+
+    memAddr(7 downto 0) <= "LLLLLLLL";
+
+    mau3 : entity work.sn74hct157
     port map(   iA          => To_X01(yBus(3 downto 0)),
                 iB          => pcReg(11 downto 8),
-                iEnableN    => mauEnHi,
+                iEnableN    => '0',
                 iSelect     => mauSel,
                 oY          => memAddr(11 downto 8));
 
-    mau3 : entity work.sn74hct157
+    mau4 : entity work.sn74hct157
     port map(   iA          => To_X01(yBus(7 downto 4)),
                 iB          => pcReg(15 downto 12),
-                iEnableN    => mauEnHi,
+                iEnableN    => '0',
                 iSelect     => mauSel,
                 oY          => memAddr(15 downto 12));
 
@@ -312,7 +308,8 @@ begin
                 oAccDrive   => acDriveEn,
                 oYBusDrive  => yBusDriveEn,
                 oYBufDrive  => yBufDriveEn,
-                oXBusSel    => xBusSel,
+                oXmemEnN    => xMemEn,
+                oImmMemEnN  => immMemEn,
                 oRamWrN     => ramWrN,
                 oRetI       => retI);
 
@@ -423,66 +420,16 @@ begin
                 oData   => vidReg);
     
     ----------------------------------------------------------
-    ------        Timer  $4000-$4FFF                   -------
-    ----------------------------------------------------------
-    -- timerLoad <= '0' when (execute='0') and (bankEn(4)='0') and (ramWrN='0') else '1';
-    
-    -- timerLoComp: entity work.sn74hct161
-    -- port map(   iClk        => iClk,
-                -- iRstN       => rstN,
-                -- iLoadN      => timerLoad,
-                -- iCntEn      => (not execute),  -- count once per instruction
-                -- iTCntEn     => '1',
-                -- iData       => dataBus(3 downto 0),
-                -- oData       => timerReg(3 downto 0),
-                -- oTerminal   => timerTermLo);
-
-    -- timerHiComp: entity work.sn74hct161
-    -- port map(   iClk        => iClk,
-                -- iRstN       => rstN,
-                -- iLoadN      => timerLoad,
-                -- iCntEn      => (not execute),  -- count once per instruction
-                -- iTCntEn     => timerTermLo,
-                -- iData       => dataBus(7 downto 4),
-                -- oData       => timerReg(7 downto 4),
-                -- oTerminal   => timerTC);
-
-    -- interrupt <= timerTC;
-
-    -- -- Driving the timer to the databus may not be needed to save a chip
-    -- timerDriveEn <= '0' when ((bankEn(4)='0') and (memDriveEn='0')) else '1';
-    
-    -- timerBufComp : entity work.sn74hct244 -- tristate buffer
-    -- port map(   iEnAN   => timerDriveEn,
-                -- iEnBN   => timerDriveEn,
-                -- iData   => timerReg,
-                -- oData   => dataBus);
-    
-    ----------------------------------------------------------
-    ------        Interrupt Enable Register            -------
-    ----------------------------------------------------------
-    intStateComp : entity work.sn74hct109
-    port map(   iClk    => iClk,
-                iRstN   => '1',
-                iSetN   => rstN,
-                iJ      => interrupt,   -- set on interrupt (active high)
-                iKN     => retI,        -- reset on retI (active low)
-                oQ      => intEn,
-                oQN     => open);
-
-    ----------------------------------------------------------
     ------        Program Counter Hold Register        -------
     ----------------------------------------------------------
-    intEnClk <= iClk or intEn;
-
     pcHoldHiComp : entity work.sn74hct574  -- FF with tristate output
-    port map(   iClk    => intEnClk,
+    port map(   iClk    => interrupt,
                 iEnN    => retI,
                 iData   => pcReg(15 downto 8),
                 oData   => yBus);
 
     pcHoldLoComp : entity work.sn74hct574  -- FF with tristate output
-    port map(   iClk    => intEnClk,
+    port map(   iClk    => interrupt,
                 iEnN    => retI,
                 iData   => pcReg(7 downto 0),
                 oData   => dataBus);
@@ -503,7 +450,7 @@ begin
                 oData   => dataBus);
 
     ----------------------------------------------------------
-    ------        Audio Out                            -------
+    ------        Audio Out $4000-$4FFF                -------
     ----------------------------------------------------------
     -- Keep writing access to XOUT with video output?
     --   or switch to memory bus access?

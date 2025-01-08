@@ -44,7 +44,8 @@ entity control is
             oAccDrive   : out sl;
             oYBufDrive  : out sl;
             oYBusDrive  : out sl;
-            oXBusSel    : out sl;
+            oXmemEnN    : out sl;
+            oImmMemEnN  : out sl;
             oRamWrN     : out sl;
             oRetI       : out sl);
 end entity control;
@@ -130,9 +131,17 @@ begin
                         and oRetI='1'
                        else '1';
                        
-    oXBusSel <= '0' when (modeName="[80,X]  , AC" or
+    oXmemEnN <= '0' when (modeName="[80,X]  , AC" or
                           modeName="[ Y,X]  , AC" or
-                          modeName="[ Y,X++],VID") else '1';
+                          modeName="[ Y,X++],VID") and
+                          iExecute = '0' else '1';
+                          
+    oImmMemEnN <= '0' when (modeName="[80,D]  , AC" or
+                            modeName="[ Y,D]  , AC" or
+                            modeName="[80,D]  ,  X" or
+                            modeName="[80,D]  ,  Y" or
+                            modeName="[80,D]  ,VID") and
+                            iExecute = '0' else '1';
 
     oXLoad    <= '0' when  modeName="[80,D]  ,  X" else '1';
     
@@ -146,7 +155,6 @@ begin
     oVidLoad  <= '0' when (modeName="[80,D]  ,VID" or 
                            modeName="[ Y,X++],VID") and opName/=" ST" else '1';
     
---    oIncX     <= '1' when  modeName="[ Y,X++],VID" else '0';
       oIncX     <= not iExecute;
   
     ----------------------------------------------------------
