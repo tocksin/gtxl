@@ -393,24 +393,6 @@ begin
                 oTerminal   => interrupt);
 
     ----------------------------------------------------------
-    ------        X Bus                                -------
-    ----------------------------------------------------------
-    -- 0 for X, 1 for D
-    xBusLoComp : entity work.sn74hct157
-    port map(   iA          => xReg(3 downto 0),
-                iB          => immReg(3 downto 0),
-                iEnableN    => '0',
-                iSelect     => xBusSel,
-                oY          => xBus(3 downto 0));
-
-    xBusHiComp : entity work.sn74hct157
-    port map(   iA          => xReg(7 downto 4),
-                iB          => immReg(7 downto 4),
-                iEnableN    => '0',
-                iSelect     => xBusSel,
-                oY          => xBus(7 downto 4));
-
-    ----------------------------------------------------------
     ------        Video Register                       -------
     ----------------------------------------------------------
     vidComp : entity work.sn74hct377  -- FF with load enable

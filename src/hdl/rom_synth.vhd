@@ -36,26 +36,26 @@ architecture rtl of rom_synth is
  0 =>x"C2",  1=>x"00", -- st [80,D] AC-- store AC to 0x8000-- save register states
  2 =>x"C3",  3=>x"01", -- st [80,D] Y-- store Y  to 0x8001
  4 =>x"10",  5=>x"38", -- ld X D-- Set X to 0x55--reload timer
- 6 =>x"02",  7=>x"00", -- nop 0 0
- 8 =>x"02",  9=>x"00", -- nop 0 0
- 10 =>x"02",  11=>x"00", -- nop 0 0
- 12 =>x"02",  13=>x"00", -- nop 0 0
- 14 =>x"01",  15=>x"03", -- ld [80,D] MEM-- Load BOOTCNT--check if booting finished
- 16 =>x"60",  17=>x"37", -- xor AC D--XOR compare 55 with BOOTCNT
- 18 =>x"F0",  19=>x"20", -- beq 0 D--branch if equal to VIDEO_HANDLER
- 20 =>x"01",  21=>x"03", -- ld [80,D] MEM-- Load BOOTCNT
- 22 =>x"60",  23=>x"01", -- xor AC D-- xor compare with 1--check if first boot
- 24 =>x"F0",  25=>x"2E", -- beq 0 D-- branch to BOOT_VECTOR if equal
- 26 =>x"00",  27=>x"01", -- ld AC D--first boot
- 28 =>x"C2",  29=>x"03", -- st [80,D] AC--store 0x01 to BOOTCNT
- 30 =>x"E3",  31=>x"00", -- reti 0 0-- reti to set interrupt enbale-- reti to clear interrupt disable for normal booting
- 32 =>x"00",  33=>x"00", -- ld AC D-- clear registers-- VIDEO_HANDLER
+ 6 =>x"01",  7=>x"03", -- ld [80,D] MEM-- Load BOOTCNT--check if booting finished
+ 8 =>x"60",  9=>x"37", -- xor AC D--XOR compare 55 with BOOTCNT
+ 10 =>x"EC",  11=>x"2E", -- bne 0 D-- branch to BOOT_VECTOR if not equal
+ 12 =>x"00",  13=>x"00", -- ld AC D-- clear registers-- VIDEO_HANDLER
+ 14 =>x"14",  15=>x"00", -- ld y D
+ 16 =>x"01",  17=>x"00", -- ld [80,D],AC MEM--load AC--restore registers
+ 18 =>x"15",  19=>x"01", -- ld [80,D],Y MEM-- load Y
+ 20 =>x"E3",  21=>x"00", -- reti 0 0-- return from interrupt
+ 22 =>x"02",  23=>x"00", -- nop 0 0
+ 24 =>x"02",  25=>x"00", -- nop 0 0
+ 26 =>x"02",  27=>x"00", -- nop 0 0
+ 28 =>x"02",  29=>x"00", -- nop 0 0
+ 30 =>x"02",  31=>x"00", -- nop 0 0
+ 32 =>x"02",  33=>x"00", -- nop 0 0
  34 =>x"02",  35=>x"00", -- nop 0 0
- 36 =>x"14",  37=>x"00", -- ld Y D
- 38 =>x"01",  39=>x"00", -- ld [80,D],AC MEM--load AC--restore registers
+ 36 =>x"02",  37=>x"00", -- nop 0 0
+ 38 =>x"02",  39=>x"00", -- nop 0 0
  40 =>x"02",  41=>x"00", -- nop 0 0
- 42 =>x"15",  43=>x"02", -- ld [80,D],Y MEM-- load Y
- 44 =>x"E3",  45=>x"00", -- reti 0 0-- return from interrupt
+ 42 =>x"02",  43=>x"00", -- nop 0 0
+ 44 =>x"02",  45=>x"00", -- nop 0 0
  46 =>x"00",  47=>x"37", -- ld AC D-- BOOT_VECTOR
  48 =>x"C2",  49=>x"03", -- st [80,D] AC-- store 55 to  BOOTCNT
  50 =>x"00",  51=>x"00", -- ld AC D--initialize AC with 0-- main test program:store value to memory, load it back, add to it, repeat

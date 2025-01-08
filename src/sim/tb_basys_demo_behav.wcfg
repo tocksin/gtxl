@@ -15,13 +15,13 @@
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
       <ZoomEndTime time="286000001fs"></ZoomEndTime>
-      <Cursor1Time time="1580fs"></Cursor1Time>
+      <Cursor1Time time="16114986fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="149"></NameColumnWidth>
       <ValueColumnWidth column_width="89"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="50" />
+   <WVObjectSize size="48" />
    <wvobject fp_name="/tb_basys_demo/clkSys" type="logic">
       <obj_property name="ElementShortName">clkSys</obj_property>
       <obj_property name="ObjectShortName">clkSys</obj_property>
@@ -86,14 +86,6 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/yBus" type="array">
       <obj_property name="ElementShortName">yBus[7:0]</obj_property>
       <obj_property name="ObjectShortName">yBus[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/xBusSel" type="logic">
-      <obj_property name="ElementShortName">xBusSel</obj_property>
-      <obj_property name="ObjectShortName">xBusSel</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/xBus" type="array">
-      <obj_property name="ElementShortName">xBus[7:0]</obj_property>
-      <obj_property name="ObjectShortName">xBus[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/instReg" type="array">
       <obj_property name="ElementShortName">instReg[7:0]</obj_property>
