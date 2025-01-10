@@ -13,15 +13,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="286000001fs"></ZoomEndTime>
-      <Cursor1Time time="16114986fs"></Cursor1Time>
+      <ZoomStartTime time="15934982fs"></ZoomStartTime>
+      <ZoomEndTime time="17388983fs"></ZoomEndTime>
+      <Cursor1Time time="16177315fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="149"></NameColumnWidth>
-      <ValueColumnWidth column_width="89"></ValueColumnWidth>
+      <ValueColumnWidth column_width="65"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="48" />
+   <WVObjectSize size="49" />
+   <wave_markers>
+      <marker time="16135399" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_basys_demo/clkSys" type="logic">
       <obj_property name="ElementShortName">clkSys</obj_property>
       <obj_property name="ObjectShortName">clkSys</obj_property>
@@ -29,6 +32,14 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/iClk" type="logic">
       <obj_property name="ElementShortName">iClk</obj_property>
       <obj_property name="ObjectShortName">iClk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/sysClk" type="logic">
+      <obj_property name="ElementShortName">sysClk</obj_property>
+      <obj_property name="ObjectShortName">sysClk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/wrClk" type="logic">
+      <obj_property name="ElementShortName">wrClk</obj_property>
+      <obj_property name="ObjectShortName">wrClk</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/iRst" type="logic">
       <obj_property name="ElementShortName">iRst</obj_property>
@@ -53,10 +64,6 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/PCReg" type="array">
       <obj_property name="ElementShortName">PCReg[15:0]</obj_property>
       <obj_property name="ObjectShortName">PCReg[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/mauSel" type="logic">
-      <obj_property name="ElementShortName">mauSel</obj_property>
-      <obj_property name="ObjectShortName">mauSel</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/memAddr" type="array">
       <obj_property name="ElementShortName">memAddr[15:0]</obj_property>

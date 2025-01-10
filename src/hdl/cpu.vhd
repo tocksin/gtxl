@@ -34,26 +34,41 @@ end entity cpu;
 architecture ttl of cpu is
 
     signal rstN         : sl;
+    signal sysClk       : sl;
+    signal wrClk        : sl;
     
+    -- State signals
     signal stateN       : slv(7 downto 0);
     signal stateOp      : slv(1 downto 0);
     signal instFetch    : sl;
     signal immFetch     : sl;
     signal execute      : sl;
+    
+    -- Program counter signals
+    signal PCReg        : slv(15 downto 0);
     signal pcClear      : sl;
-    signal pcCount      : sl;
     signal pcLoadLo     : sl;
     signal pcLoadHi     : sl;
-    
     signal terminal0    : sl;
     signal terminal1    : sl;
     signal terminal2    : sl;
+    signal PCHold       : slv(15 downto 0);
+    signal retI         : sl;
     
+    -- Memory MUX signals
+    signal memAddr      : slv(15 downto 0);
+    signal bankEn       : slv(7 downto 0);
+    signal memDriveEn   : sl;
+    signal xMemEn       : sl;
+    signal immMemEn     : sl;
+    
+    -- Instruction/Immediate register signals
     signal instReg      : slv(7 downto 0);
     signal immEn        : sl;
     signal immDriveEn   : sl;
     signal immReg       : slv(7 downto 0);
     
+    -- ALU and Accumulator signals
     signal aluOp        : slv(4 downto 0);
     signal aluData      : slv(7 downto 0);
     signal aluCarry     : sl;
@@ -61,6 +76,7 @@ architecture ttl of cpu is
     signal acLoad       : sl;
     signal acDriveEn    : sl;
 
+    -- Y regsiter signals
     signal yReg         : slv(7 downto 0) := x"00";
     signal yLoad        : sl;
     signal yDriven      : sl;
@@ -68,44 +84,34 @@ architecture ttl of cpu is
     signal yBusDriveEn  : sl;
     signal yBufDriveEn  : sl;
 
+    -- X register signals
     signal xReg         : slv(7 downto 0) := x"00";
     signal xCount       : sl;
     signal xLoad        : sl;
     signal xTermLo      : sl;
+    signal interrupt    : sl;
     
+    -- Video register signals
     signal vidLoad      : sl;
     signal vidReg       : slv(7 downto 0) := x"00";
     
-    signal PCReg        : slv(15 downto 0);
-    signal mauEnLo      : sl;
-    signal mauEnHi      : sl;
-    signal mauSel       : sl;
-    signal mauDisableLo : sl;
-    signal memAddr      : slv(15 downto 0);
-    signal bankEn       : slv(7 downto 0);
-    signal memDriveEn   : sl;
-    
+    -- Databus signals
     signal dataRom      : slv(7 downto 0);
     signal ramWrN       : sl;
     signal dataRam      : slv(7 downto 0);
     signal dataRamDef   : slv(7 downto 0);
     signal dataBus      : slv(7 downto 0);
-
-    signal interrupt    : sl;
     
-    signal PCHold       : slv(15 downto 0);
-
-    signal retI         : sl;
+    -- Peripheral signals
     signal keyArray     : slv(7 downto 0);
     signal audioReg     : slv(7 downto 0);
-
-    signal xMemEn       : sl;
-    signal immMemEn     : sl;
     
 begin
 
     rstN <= not iRst;
-
+    sysClk <= iClk after 10 ns;
+    wrClk <= iClk or sysClk;
+    
     ----------------------------------------------------------
     ------          State Machine                      -------
     ----------------------------------------------------------
@@ -123,7 +129,7 @@ begin
 
     -- State machine (shifter)
     stateComp : entity work.sn74hct299(rtl)
-    port map(clkIn           => iClk,
+    port map(clkIn           => sysClk,
              rstNIn          => '1',
              modeSIn         => stateOp,
              serial0In       => stateN(2),
@@ -139,44 +145,43 @@ begin
     ----------------------------------------------------------
     ------          Program Counter                    -------
     ----------------------------------------------------------
-    pcClear <= '0' when (rstN='0') or (((interrupt='1') and (execute='0') and iClk='0')) else '1';
-    pcCount <= execute;
+    pcClear <= '0' when (rstN='0') or (((interrupt='1') and (execute='0') and sysClk='0')) else '1';
 
     pc0: entity work.sn74hct161
-    port map(   iClk        => iClk,
+    port map(   iClk        => sysClk,
                 iRstN       => pcClear,
                 iLoadN      => pcLoadLo,    -- load PC when we jump or return from interrupt
-                iCntEn      => pcCount,
+                iCntEn      => execute,
                 iTCntEn     => '1',
                 iData       => dataBus(3 downto 0),
                 oData       => pcReg(3 downto 0),
                 oTerminal   => terminal0);
 
     pc1: entity work.sn74hct161
-    port map(   iClk        => iClk,
+    port map(   iClk        => sysClk,
                 iRstN       => pcClear,
                 iLoadN      => pcLoadLo,
-                iCntEn      => pcCount,
+                iCntEn      => execute,
                 iTCntEn     => terminal0,
                 iData       => dataBus(7 downto 4),
                 oData       => pcReg(7 downto 4),
                 oTerminal   => terminal1);
 
     pc2: entity work.sn74hct161
-    port map(   iClk        => iClk,
+    port map(   iClk        => sysClk,
                 iRstN       => pcClear,
                 iLoadN      => pcLoadHi,
-                iCntEn      => pcCount,
+                iCntEn      => execute,
                 iTCntEn     => terminal1,
                 iData       => yBus(3 downto 0),
                 oData       => pcReg(11 downto 8),
                 oTerminal   => terminal2);
 
     pc3: entity work.sn74hct161
-    port map(   iClk        => iClk,
+    port map(   iClk        => sysClk,
                 iRstN       => pcClear,
                 iLoadN      => pcLoadHi,
-                iCntEn      => pcCount,
+                iCntEn      => execute,
                 iTCntEn     => terminal2,
                 iData       => yBus(7 downto 4),
                 oData       => pcReg(15 downto 12),
@@ -185,13 +190,11 @@ begin
     ----------------------------------------------------------
     ------          Memory Address Selector            -------
     ----------------------------------------------------------
-    --      EnHi   EnLo   Sel    Memory access
-    --      0      0      0      [ Ybus, Xbus] -- normal memory access
-    --      0      0      1      [PC,PC] -- fetch
+    --      Sel    Memory access
+    --      0      [ Ybus, Xbus] -- normal memory access
+    --      1      [PC,PC] -- fetch
     -- Ybus can be either Y register or 0x80
     -- Xbus can be either X register or D register
-    
-    mauSel <= execute; -- only 1 during program counter access
     
     mau0 : entity work.sn74hct244 -- tristate buffer
     port map(   iEnAN   => immMemEn,
@@ -217,14 +220,14 @@ begin
     port map(   iA          => To_X01(yBus(3 downto 0)),
                 iB          => pcReg(11 downto 8),
                 iEnableN    => '0',
-                iSelect     => mauSel,
+                iSelect     => execute,
                 oY          => memAddr(11 downto 8));
 
     mau4 : entity work.sn74hct157
     port map(   iA          => To_X01(yBus(7 downto 4)),
                 iB          => pcReg(15 downto 12),
                 iEnableN    => '0',
-                iSelect     => mauSel,
+                iSelect     => execute,
                 oY          => memAddr(15 downto 12));
 
     ----------------------------------------------------------
@@ -280,7 +283,7 @@ begin
     ------         Instruction Register                -------
     ----------------------------------------------------------
     instComp : entity work.sn74hct377  -- FF with load enable
-    port map(   iClk    => iClk,
+    port map(   iClk    => sysClk,
                 iLoadN  => instFetch,
                 iData   => dataBus,
                 oData   => instReg);
@@ -289,7 +292,8 @@ begin
     ------         Instruction Decoder                 -------
     ----------------------------------------------------------
     controlComp: entity work.control
-    port map(   iClk        => iClk,
+    port map(   iClk        => sysClk,
+                iWrClk      => wrClk,
                 iInst       => instReg,
                 iCarry      => aluCarry,
                 iSign       => acReg(7),
@@ -317,7 +321,7 @@ begin
     ------         Immediate Data Register             -------
     ----------------------------------------------------------
     immeComp : entity work.sn74hct377  -- FF with tristate output
-    port map(   iClk    => iClk,
+    port map(   iClk    => sysClk,
                 iLoadN  => immFetch,
                 iData   => dataBus,
                 oData   => immReg);
@@ -342,7 +346,7 @@ begin
     ------         Accumulator Register and Buffer     -------
     ----------------------------------------------------------
     accComp : entity work.sn74hct377  -- FF with load enable
-    port map(   iClk    => iClk,
+    port map(   iClk    => sysClk,
                 iLoadN  => acLoad,
                 iData   => aluData,
                 oData   => acReg);
@@ -373,7 +377,7 @@ begin
     ------        X Register                           -------
     ----------------------------------------------------------
     xLoComp: entity work.sn74hct161
-    port map(   iClk        => iClk,
+    port map(   iClk        => sysClk,
                 iRstN       => rstN,
                 iLoadN      => xLoad,
                 iCntEn      => xCount,
@@ -383,7 +387,7 @@ begin
                 oTerminal   => xTermLo);
 
     xHiComp: entity work.sn74hct161
-    port map(   iClk        => iClk,
+    port map(   iClk        => sysClk,
                 iRstN       => rstN,
                 iLoadN      => xLoad,
                 iCntEn      => xCount,
@@ -396,7 +400,7 @@ begin
     ------        Video Register                       -------
     ----------------------------------------------------------
     vidComp : entity work.sn74hct377  -- FF with load enable
-    port map(   iClk    => iClk,
+    port map(   iClk    => sysClk,
                 iLoadN  => vidLoad,
                 iData   => aluData,
                 oData   => vidReg);
@@ -442,7 +446,7 @@ begin
     -- Ground is second ring
     -- Mic is sleeve.  Maybe have jumpers to select second audio input connector, or from mic sleeve.
     audioComp : entity work.sn74hct377  -- FF with load enable
-    port map(   iClk    => iClk,
+    port map(   iClk    => sysClk,
                 iLoadN  => (bankEn(4) and ramWrN),
                 iData   => acReg,
                 oData   => audioReg);

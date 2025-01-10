@@ -26,6 +26,7 @@ library work;           use work.tools_pkg.all;
 
 entity control is
     port(   iClk        : in sl;
+            iWrClk      : in sl;
             iInst       : in slv(7 downto 0);
             iCarry      : in sl;
             iSign       : in sl;
@@ -180,7 +181,7 @@ begin
     fullName <= opName & modeName(1 to 8) & modeName(9 to 12) when busDriveName = "     MEM" else
                 opName & busDriveName & modeName(9 to 12);
 
-    oRamWrN <= '0' when (iClk='0') and (opName=" ST") and (oMemDrive='1') else '1';
+    oRamWrN <= '0' when (iWrClk='0')  and (opName=" ST") and (oMemDrive='1') else '1';
     
     ----------------------------------------------------------
     ------          Branch/Jump detection              -------

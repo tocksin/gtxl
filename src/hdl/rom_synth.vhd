@@ -33,37 +33,44 @@ architecture rtl of rom_synth is
     type rom_type is array (0 to (2**iAddr'length)-1) of std_logic_vector(oData'range);
     signal rom : rom_type := ( 
 
- 0 =>x"C2",  1=>x"00", -- st [80,D] AC-- store AC to 0x8000-- save register states
- 2 =>x"C3",  3=>x"01", -- st [80,D] Y-- store Y  to 0x8001
- 4 =>x"10",  5=>x"38", -- ld X D-- Set X to 0x55--reload timer
- 6 =>x"01",  7=>x"03", -- ld [80,D] MEM-- Load BOOTCNT--check if booting finished
- 8 =>x"60",  9=>x"37", -- xor AC D--XOR compare 55 with BOOTCNT
- 10 =>x"EC",  11=>x"2E", -- bne 0 D-- branch to BOOT_VECTOR if not equal
- 12 =>x"00",  13=>x"00", -- ld AC D-- clear registers-- VIDEO_HANDLER
- 14 =>x"14",  15=>x"00", -- ld y D
- 16 =>x"01",  17=>x"00", -- ld [80,D],AC MEM--load AC--restore registers
- 18 =>x"15",  19=>x"01", -- ld [80,D],Y MEM-- load Y
- 20 =>x"E3",  21=>x"00", -- reti 0 0-- return from interrupt
- 22 =>x"02",  23=>x"00", -- nop 0 0
- 24 =>x"02",  25=>x"00", -- nop 0 0
- 26 =>x"02",  27=>x"00", -- nop 0 0
- 28 =>x"02",  29=>x"00", -- nop 0 0
- 30 =>x"02",  31=>x"00", -- nop 0 0
- 32 =>x"02",  33=>x"00", -- nop 0 0
- 34 =>x"02",  35=>x"00", -- nop 0 0
- 36 =>x"02",  37=>x"00", -- nop 0 0
- 38 =>x"02",  39=>x"00", -- nop 0 0
- 40 =>x"02",  41=>x"00", -- nop 0 0
- 42 =>x"02",  43=>x"00", -- nop 0 0
- 44 =>x"02",  45=>x"00", -- nop 0 0
- 46 =>x"00",  47=>x"37", -- ld AC D-- BOOT_VECTOR
- 48 =>x"C2",  49=>x"03", -- st [80,D] AC-- store 55 to  BOOTCNT
- 50 =>x"00",  51=>x"00", -- ld AC D--initialize AC with 0-- main test program:store value to memory, load it back, add to it, repeat
- 52 =>x"C2",  53=>x"04", -- st [80,D] AC--store value-- MAIN_LOOP
- 54 =>x"01",  55=>x"04", -- ld [80,D] MEM--load value
- 56 =>x"80",  57=>x"01", -- add AC D--add 1
- 58 =>x"1A",  59=>x"00", -- ld VID AC-- copy result to VID output incrementing X for testing
- 60 =>x"FC",  61=>x"34", -- bra 0 D-- branch back to MAIN_LOOP
+ 0 =>x"C2",
+ 1 =>x"00",
+ 2 =>x"C3",
+ 3 =>x"01",
+ 4 =>x"10",
+ 5 =>x"38",
+ 6 =>x"01",
+ 7 =>x"03",
+ 8 =>x"60",
+ 9 =>x"37",
+ 10 =>x"EC",
+ 11 =>x"16",
+ 12 =>x"00",
+ 13 =>x"00",
+ 14 =>x"14",
+ 15 =>x"00",
+ 16 =>x"01",
+ 17 =>x"00",
+ 18 =>x"15",
+ 19 =>x"01",
+ 20 =>x"E3",
+ 21 =>x"00",
+ 22 =>x"00",
+ 23 =>x"37",
+ 24 =>x"C2",
+ 25 =>x"03",
+ 26 =>x"00",
+ 27 =>x"00",
+ 28 =>x"C2",
+ 29 =>x"04",
+ 30 =>x"01",
+ 31 =>x"04",
+ 32 =>x"80",
+ 33 =>x"01",
+ 34 =>x"1A",
+ 35 =>x"00",
+ 36 =>x"FC",
+ 37 =>x"1C",
 
     ----------------------------------------------------------
     ------        X Lookup Table                       -------
