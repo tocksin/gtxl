@@ -26,6 +26,7 @@ library work;           use work.tools_pkg.all;
 
 entity control is
     port(   iClk        : in sl;
+            iWrClk      : in sl;
             iInst       : in slv(7 downto 0);
             iCarry      : in sl;
             iSign       : in sl;
@@ -44,8 +45,9 @@ entity control is
             oAccDrive   : out sl;
             oYBufDrive  : out sl;
             oYBusDrive  : out sl;
+            oXmemEnN    : out sl;
+            oImmMemEnN  : out sl;
             oRamWrN     : out sl;
-            oMauLoDis   : out sl;
             oRetI       : out sl);
 end entity control;
 
@@ -68,9 +70,9 @@ begin
     ------          Operation decoding                 -------
     ----------------------------------------------------------
     operationDecoderComp : entity work.sn74hct138
-    port map(   iEn     => iInterrupt,
+    port map(   iEn     => '1',
                 iEnLo0  => iExecute,
-                iEnLo1  => '0',
+                iEnLo1  => iInterrupt,
                 iA      => iInst(5),
                 iB      => iInst(6),
                 iC      => iInst(7),
@@ -104,38 +106,58 @@ begin
     ----------------------------------------------------------
     ------      Memory MUX and Destination decoder     -------
     ----------------------------------------------------------
-    -- IR4,3,2
-    -- 000- [ Y,X]   , AC
-    -- 001- [80,X]   , AC
-    -- 010  [80,00]  , AC
-    -- 011- [80,X]   , X
-    -- 100- [80,X]   , Y
-    -- 101  [ Y,00]  , Y
-    -- 110- [80,X]   , VID
-    -- 111- [ Y,X++] , VID
-    
-    modeEn <= operation(7) and iInterrupt;
-    
     modeDecoderComp : entity work.sn74hct138
-    port map(   iEn     => modeEn, -- disable during Bcc iInterrupt
+    port map(   iEn     => operation(7), -- disable during Bcc iInterrupt
                 iEnLo0  => iExecute,
-                iEnLo1  => '0',
+                iEnLo1  => iInterrupt,
                 iA      => iInst(2),
                 iB      => iInst(3),
                 iC      => iInst(4),
                 oY      => mode);
-
-    modeName <= "[80,X]  , AC" when mode="11111110" else  --Y Bus on
-                "[ Y,X]  , AC" when mode="11111101" else  --Y Bus off
-                "[80,00] , AC" when mode="11111011" else  --Y Bus off
-                "[80,X]  ,  X" when mode="11110111" else  --Y Bus off
-                "[80,X]  ,  Y" when mode="11101111" else  --Y Bus off
-                "[ Y,00] ,  Y" when mode="11011111" else  --Y Bus on
-                "[80,X]  ,VID" when mode="10111111" else  --Y Bus off
+                
+    modeName <= "[80,D]  , AC" when mode="11111110" else  --Y Bus off
+                "[80,X]  , AC" when mode="11111101" else  --Y Bus on
+                "[ Y,D]  , AC" when mode="11111011" else  --Y Bus off
+                "[ Y,X]  , AC" when mode="11110111" else  --Y Bus off
+                "[80,D]  ,  X" when mode="11101111" else  --Y Bus off
+                "[80,D]  ,  Y" when mode="11011111" else  --Y Bus on
+                "[80,D]  ,VID" when mode="10111111" else  --Y Bus off
                 "[ Y,X++],VID" when mode="01111111" else  --Y Bus on
                 "Disabled,Bcc" when mode="11111111" else
                 "ERROR   ,ERR";
+
+    oYBusDrive <= '0' when (modeName="[ Y,D]  , AC"
+                         or modeName="[ Y,X]  , AC"
+                         or modeName="[ Y,X++],VID")
+                        and oRetI='1'
+                       else '1';
+                       
+    oXmemEnN <= '0' when (modeName="[80,X]  , AC" or
+                          modeName="[ Y,X]  , AC" or
+                          modeName="[ Y,X++],VID") and
+                          iExecute = '0' else '1';
+                          
+    oImmMemEnN <= '0' when (modeName="[80,D]  , AC" or
+                            modeName="[ Y,D]  , AC" or
+                            modeName="[80,D]  ,  X" or
+                            modeName="[80,D]  ,  Y" or
+                            modeName="[80,D]  ,VID") and
+                            iExecute = '0' else '1';
+
+    oXLoad    <= '0' when  modeName="[80,D]  ,  X" else '1';
     
+    oYLoad    <= '0' when  modeName="[80,D]  ,  Y" else '1';
+
+    oAcLoad   <= '0' when (modeName="[80,D]  , AC" or 
+                           modeName="[80,X]  , AC" or
+                           modeName="[ Y,D]  , AC" or 
+                           modeName="[ Y,X]  , AC" )  and opName/=" ST" else '1';
+
+    oVidLoad  <= '0' when (modeName="[80,D]  ,VID" or 
+                           modeName="[ Y,X++],VID") and opName/=" ST" else '1';
+    
+    oIncX     <= not iExecute;
+  
     ----------------------------------------------------------
     ------          Data Bus Source Selector           -------
     ----------------------------------------------------------
@@ -144,15 +166,9 @@ begin
                 iData    => iInst(1 downto 0),
                 oData    => busSrc);
 
-    oYBusDrive <= '0' when (modeName="[ Y,X]  , AC"
-                         or modeName="[ Y,00] ,  Y"
-                         or modeName="[ Y,X++],VID")
-                        and oRetI='1'
-                       else '1';
-
     oYBufDrive <= busSrc(3) when oPCLoadHi='1' else '1'; -- override during jump instruction
-    oMemDrive  <= busSrc(2);
-    oAccDrive  <= busSrc(1);
+    oAccDrive  <= busSrc(2);
+    oMemDrive  <= busSrc(1) when iExecute='0' else '0'; -- instFetch and immFetch states always enable memory output
     oImmDrive  <= busSrc(0);
 
     busDriveName <= "       Y" when oYBufDrive='0' else
@@ -164,25 +180,8 @@ begin
     
     fullName <= opName & modeName(1 to 8) & modeName(9 to 12) when busDriveName = "     MEM" else
                 opName & busDriveName & modeName(9 to 12);
-    
-    oXLoad    <= '0' when  modeName="[80,X]  ,  X" else '1';
-    
-    oYLoad    <= '0' when  modeName="[80,X]  ,  Y" or 
-                           modeName="[ Y,00] ,  Y" else '1';
 
-    oAcLoad   <= '0' when (modeName="[ Y,X]  , AC" or 
-                           modeName="[80,X]  , AC" or
-                           modeName="[80,00] , AC")  and opName/=" ST" else '1';
-
-    oVidLoad  <= '0' when (modeName="[80,X]  ,VID" or 
-                           modeName="[ Y,X++],VID") and opName/=" ST" else '1';
-    
-    oIncX     <= '1' when  modeName="[ Y,X++],VID" else '0';
-    
-    oMauLoDis <= '1' when  modeName="[80,00] , AC" or 
-                           modeName="[ Y,00] ,  Y" else '0';
-    
-    oRamWrN <= '0' when (iClk='0') and (opName=" ST") and (oMemDrive='1') else '1';
+    oRamWrN <= '0' when (iWrClk='0')  and (opName=" ST") and (oMemDrive='1') else '1';
     
     ----------------------------------------------------------
     ------          Branch/Jump detection              -------
