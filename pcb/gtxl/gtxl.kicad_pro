@@ -580,16 +580,16 @@
       "Root"
     ],
     [
+      "a6a24a76-6a28-4ed6-98c2-1e1f1d137c76",
+      "State Machine"
+    ],
+    [
       "cfc3f233-b18f-4fff-833a-4cc277cf255e",
       "Program Counter"
     ],
     [
       "7f6cea06-b5fc-4dc4-8bc7-4954d092aea6",
       "MAU"
-    ],
-    [
-      "a6a24a76-6a28-4ed6-98c2-1e1f1d137c76",
-      "State Machine"
     ],
     [
       "b58bac8b-47b1-40f3-a395-9e933acaa71f",
@@ -606,6 +606,10 @@
     [
       "cc03b095-3dfc-4266-bd94-b97941070679",
       "ALU"
+    ],
+    [
+      "096d775d-4f8c-4f5c-ac8a-0d330a2571c8",
+      "Keyboard"
     ]
   ],
   "text_variables": {}

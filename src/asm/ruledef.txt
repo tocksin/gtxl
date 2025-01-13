@@ -1,3 +1,5 @@
+; https://hlorenzi.github.io/customasm/web/
+
 #bankdef prg      { #addr 0x0000, #size 0x3ffe, #outp 8 * 0x0   }
 #bankdef zeropage { #addr 0x8000, #size 0x100 }
 #bankdef ram      { #addr 0x8000, #size 0x7ffe }
@@ -233,28 +235,37 @@ yStore: #res 1
 xStore: #res 1
 bootCheck: #res 1
 testCount: #res 1
+yLineNumber : #res 1
+subLineAddr : #res 1
 
 #bank prg
 
 interrupt:
 	; store registers and reload timer
-	sta acStore
-	sty yStore
-	ldx #56
+	sta acStore   ; #1
+	sty yStore    ; #2
+	ldx #56       ; #3
 	
 	; check for cold boot
-	lda bootCheck
-	xora #55
-	bne .boot
+	lda bootCheck ; #4
+	xora #55      ; #5
+	bne .boot     ; #6
 	
-	; clear registers to test / emulate video drawing
-	lda #0
-	ldy #0
-	
+    ; Load line address
+    ldy yLineNumber ; #7
+    ldv (y,x)     ; draw active video pixel
+    ;; repeat 159 times    
+    
+    ;        branch to one of four routines - the last will increment Y.  
+    bra (subLineAddr) ; #8
+    ;            each will bump branch address to next routine.
+    ;        turn on and off the horizontal sync at the right time
+    ;        check if we can switch to blank lines
+
 	; end of interrupt routine - restore registers
-	lda acStore
-	ldy yStore
-	reti
+	lda acStore   ; #36
+	ldy yStore    ; #37
+	reti          ; #38
 	
 .boot:
 	; record that we have booted

@@ -4651,6 +4651,28 @@
 			)
 		)
 	)
+	(global_label "ADDR[0..15]"
+		(shape input)
+		(at 175.26 52.07 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "4e29bcca-e147-4dc0-97e2-0162a2e55017")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 160.8447 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "{slash}BANK2"
 		(shape input)
 		(at 125.73 102.87 180)
@@ -4691,6 +4713,28 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "DBUS[0..7]"
+		(shape input)
+		(at 254 52.07 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "65bcc383-850a-4b98-98c8-68a430d726ff")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 267.3872 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 				(hide yes)
 			)
 		)
