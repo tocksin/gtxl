@@ -132,6 +132,9 @@ Need an address decoder for the ROM area to split the peripherals off.  Expansio
      it's possible to simulate a cold boot then by clearing BOOTCNT and waiting for interrupt.
      interesting that real resets won't actually reset the computer then.  only software reboots.
      maybe tie a reset button into the power system instead  . (series push button with power).
+
+# Assembler
+I decided to not write an assembler because it's a real pain.  I've done it a couple times and no thank you.  I also don't want to have to rewrite the Gigatron assembler.  Instead I chose to use the [customasm](https://github.com/hlorenzi/customasm) project which is a customizable assembler.  Just have to feed it your instruction set, and it's good to go.  I've given it a quick test and I think it will work well with this project.
     
 # Fibonachi Benchmark program?
       fibonachi - n+1 = n + n-1
