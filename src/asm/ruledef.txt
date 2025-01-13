@@ -188,45 +188,56 @@
 
 	jmp	{value: i8}	     => 0xe0 @ value
 	jmp ({value: i8})	 => 0xe1 @ value
+	jmp ({value: i16})	 => 0xe1 @ value[7:0]
 	jmp ac				 => 0xe200
 	reti				 => 0xe300
 	
 	bgt {value: i8}	 	 => 0xe4 @ value
 	bgt ({value: i8})	 => 0xe5 @ value
+	bgt ({value: i16})	 => 0xe5 @ value[7:0]
 	bgt ac				 => 0xe600
 	bgt y				 => 0xe700
 
 	blt {value: i8}		 => 0xe8 @ value
 	blt ({value: i8})	 => 0xe9 @ value
+	blt ({value: i16})	 => 0xe9 @ value[7:0]
 	blt ac				 => 0xea00
 	blt y				 => 0xeb00
 
 	bne {value: i8}		 => 0xec @ value
 	bne ({value: i8})	 => 0xed @ value
+	bne ({value: i16})	 => 0xed @ value[7:0]
 	bne ac				 => 0xee00
 	bne y				 => 0xef00
 
 	beq {value: i8}	 	 => 0xf0 @ value
 	beq ({value: i8})	 => 0xf1 @ value
+	beq ({value: i16})	 => 0xf1 @ value[7:0]
 	beq ac				 => 0xf200
 	beq y				 => 0xf300
 
 	bge {value: i8}		 => 0xf4 @ value
 	bge ({value: i8})	 => 0xf5 @ value
+	bge ({value: i16})	 => 0xf5 @ value[7:0]
 	bge ac				 => 0xf600
 	bge y				 => 0xf700
 
 	ble {value: i8}		 => 0xf8 @ value
 	ble ({value: i8})	 => 0xf9 @ value
+	ble ({value: i16})	 => 0xf9 @ value[7:0]
 	ble ac				 => 0xfa00
 	ble y				 => 0xfb00
 
 	bra {value: i8}		 => 0xfc @ value
 	bra ({value: i8})	 => 0xfd @ value
+	bra ({value: i16})	 => 0xfd @ value[7:0]
 	bra ac				 => 0xfe00
 	bra y				 => 0xff00
 
 }
+
+VIDBLANK = 0x40
+VIDSYNC = 0x00
 
 #bank zeropage
 
@@ -244,35 +255,73 @@ interrupt:
 	; store registers and reload timer
 	sta acStore   ; #1
 	sty yStore    ; #2
-	ldx #56       ; #3
 	
 	; check for cold boot
-	lda bootCheck ; #4
-	xora #55      ; #5
-	bne .boot     ; #6
+	lda bootCheck ; #3
+	xora #55      ; #4
+	bne boot     ; #5
+
+    ; branch to one of six routines
+	; first four draw active lines
+	; one high equalization half-line
+	; one low equalization half-line
+    bra (subLineAddr) ; #8
+
+	;active line
+	;frontporch 10 clocks
+	;sync low 15 clocks
+	;sync high 15 clocks
+	;active pixels 160 clocks
+
+	; 6 short equalization lines
+	;frontporch 5 clocks
+	;sync low 7 clocks
+	;sync high then return
+	
+	; 5 long equalization lines
+	
+	; 5 more short equalization lines
 	
     ; Load line address
     ldy yLineNumber ; #7
     ldv (y,x)     ; draw active video pixel
     ;; repeat 159 times    
     
-    ;        branch to one of four routines - the last will increment Y.  
-    bra (subLineAddr) ; #8
     ;            each will bump branch address to next routine.
     ;        turn on and off the horizontal sync at the right time
     ;        check if we can switch to blank lines
-
-	; end of interrupt routine - restore registers
-	lda acStore   ; #36
-	ldy yStore    ; #37
-	reti          ; #38
+    
+    firstLineStart:
+    ; #9
+    ldv #VIDSYNC; #10 - sync start (15 clocks)
+    ;set subLineAddr to second
+    ldv #VIDBLANK    ; #25 - sync ends
+	bra endinterrupt ; #26
 	
-.boot:
+    secondLineStart:
+    thirdLineStart:
+    fourthLineStart:
+    ; increase yLineNumber
+	; check if yLineNumber = 120
+	; if so then switch subLineAddr to high equilization pulses
+    ; otherwise switch to firstLineStart
+	
+	; end of interrupt routine - restore registers
+	endinterrupt:
+	lda acStore   ; #27
+	ldy yStore    ; #28
+	reti          ; #29
+	; about 7 instructions left for normal operations.  Not a lot.
+	
+	
+	; equalization pulses
+	
+boot:
 	; record that we have booted
 	lda #55
     sta bootCheck
 	
-.main:
+main:
 	lda #0
 	.loop:
 		sta testCount ; test memory by saving and restoring variable
