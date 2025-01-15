@@ -114,7 +114,19 @@ Need an address decoder for the ROM area to split the peripherals off.  Expansio
   - The Y register can be replaced with one that has an output enable.
   - I'll need to add an extra buffer chip so I can also drive Y to the databus.
 
-
+# Y bus
+     The Y bus is slightly more complex now. It will have the following behaviors.
+     Y Reg Enable    Y Buffer Enable    Y Bus(and MAU)   Databus   Function
+         on               on             Y                 Y        Whenever Y needs to be driven to databus
+         on               off            Y                ZZ        For memory access [Y,X] or [Y,D] or jump instructions
+         off           don't care       0x80                        For memory access [80,D] or [80,X].  Y can't be put on databus in this mode.
+         off           don't care       PC Hold          PC Hold    RETI instruction. PC Hold register is driving
+         don't care    don't care                                   Interrupt
+     The Y Reg Enable will be controlled by the memory mode diode ROM, but it is overriden by the RETI instruction
+     The Y Buffer Enable will be controlled by the databus driver instruction bits [1:0].
+        During memory access modes [80,D] and [80,X], the Y bus would be unavailable on the databus.
+        Can't store Y to [80,D] for example.
+     
 # Interrupt handler
      first store registers to memory (assume not a cold boot)
      next load X counter to ensure timing - time sensitive

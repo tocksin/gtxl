@@ -141,7 +141,8 @@ begin
                             modeName="[ Y,D]  , AC" or
                             modeName="[80,D]  ,  X" or
                             modeName="[80,D]  ,  Y" or
-                            modeName="[80,D]  ,VID") and
+                            modeName="[80,D]  ,VID" or 
+                            modeName="Disabled,Bcc") and
                             iExecute = '0' else '1';
 
     oXLoad    <= '0' when  modeName="[80,D]  ,  X" else '1';

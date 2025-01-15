@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="12410000fs"></ZoomStartTime>
-      <ZoomEndTime time="85310001fs"></ZoomEndTime>
-      <Cursor1Time time="33705485fs"></Cursor1Time>
+      <ZoomStartTime time="91794684fs"></ZoomStartTime>
+      <ZoomEndTime time="108401436fs"></ZoomEndTime>
+      <Cursor1Time time="33705fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="149"></NameColumnWidth>
-      <ValueColumnWidth column_width="61"></ValueColumnWidth>
+      <NameColumnWidth column_width="148"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="49" />
+   <WVObjectSize size="50" />
    <wvobject fp_name="/tb_basys_demo/clkSys" type="logic">
       <obj_property name="ElementShortName">clkSys</obj_property>
       <obj_property name="ObjectShortName">clkSys</obj_property>
@@ -224,5 +224,9 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/retI" type="logic">
       <obj_property name="ElementShortName">retI</obj_property>
       <obj_property name="ObjectShortName">retI</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/audioReg" type="array">
+      <obj_property name="ElementShortName">audioReg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">audioReg[7:0]</obj_property>
    </wvobject>
 </wave_config>
