@@ -106,6 +106,7 @@ architecture ttl of cpu is
     signal keyArray     : slv(7 downto 0);
     signal audioReg     : slv(7 downto 0);
     
+    signal testreg      : slv(7 downto 0);
 begin
 
     rstN <= not iRst;
@@ -196,25 +197,43 @@ begin
     -- Ybus can be either Y register or 0x80
     -- Xbus can be either X register or D register
     
-    mau0 : entity work.sn74hct244 -- tristate buffer
-    port map(   iEnAN   => immMemEn,
-                iEnBN   => immMemEn,
-                iData   => immReg,
-                oData   => memAddr(7 downto 0));
+    -- mau0 : entity work.sn74hct244 -- tristate buffer
+    -- port map(   iEnAN   => immMemEn,
+                -- iEnBN   => immMemEn,
+                -- iData   => immReg,
+                -- oData   => memAddr(7 downto 0));
 
-    mau1 : entity work.sn74hct244 -- tristate buffer
-    port map(   iEnAN   => xMemEn,
-                iEnBN   => xMemEn,
-                iData   => xReg,
-                oData   => memAddr(7 downto 0));
+    -- mau1 : entity work.sn74hct244 -- tristate buffer
+    -- port map(   iEnAN   => xMemEn,
+                -- iEnBN   => xMemEn,
+                -- iData   => xReg,
+                -- oData   => memAddr(7 downto 0));
 
-    mau2 : entity work.sn74hct244
-    port map(   iEnAN   => (not execute),
-                iEnBN   => (not execute),
-                iData   => pcReg(7 downto 0),
-                oData   => memAddr(7 downto 0));
+    -- mau2 : entity work.sn74hct244
+    -- port map(   iEnAN   => (not execute),
+                -- iEnBN   => (not execute),
+                -- iData   => pcReg(7 downto 0),
+                -- oData   => memAddr(7 downto 0));
 
-    memAddr(7 downto 0) <= "LLLLLLLL";
+    -- memAddr(7 downto 0) <= "LLLLLLLL";
+    process (immMemEn, xMemEn, execute, immReg, xReg, pcReg)
+    begin
+        testreg <= "00000000";
+        if immMemEn='0' then
+            testreg <= immReg;
+        elsif xMemEn='0' then
+            testreg <= xReg;
+        elsif execute='1' then
+            testreg <= pcReg(7 downto 0);
+        end if;
+    end process;
+    -- testreg             <= 
+                           -- immReg            when immMemEn='0' else
+                           -- xReg              when xMemEn='0' else
+                           -- pcReg(7 downto 0) when execute='1' else
+                           -- "LLLLLLLL";
+
+    memAddr(7 downto 0) <= testreg;
 
     mau3 : entity work.sn74hct157
     port map(   iA          => To_X01(yBus(3 downto 0)),

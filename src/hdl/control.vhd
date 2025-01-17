@@ -128,7 +128,8 @@ begin
 
     oYBusDrive <= '0' when (modeName="[ Y,D]  , AC"
                          or modeName="[ Y,X]  , AC"
-                         or modeName="[ Y,X++],VID")
+                         or modeName="[ Y,X++],VID"
+                         or oPCLoadHi='0')
                         and oRetI='1'
                        else '1';
                        

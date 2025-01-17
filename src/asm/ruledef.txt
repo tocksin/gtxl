@@ -5,11 +5,10 @@
 #bankdef ram      { #addr 0x8000, #size 0x7ffe }
 
 
-
 #ruledef
 {
-	lda #{value: i8}	 => 0x00 @ value
-	lda {value: i16}	 => 0x01 @ value[7:0]
+	lda #{value}		 => 0x00 @ value`8
+	lda {value}	 		 => 0x01 @ value`8
 	lda {value :i8}		 => 0x01 @ value
 	nop					 => 0x02 @ 0x00
 	lda (x)				 => 0x05 @ 0x00
@@ -23,8 +22,7 @@
 	ldx ac				 => 0x12 @ 0x00
 
 	ldy #{value: i8}	 => 0x14 @ value
-	ldy {value: i16}	 => 0x15 @ value[7:0]
-	ldy {value :i8}	 	 => 0x15 @ value
+	ldy {value}			 => 0x15 @ value`8
 	ldy ac				 => 0x16 @ 0x00
 
 	ldv #{value: i8}	 => 0x18 @ value
@@ -181,54 +179,58 @@
 	sta {value: i8},y => 0xd6 @ value
 ;	sty {value: i8},y => 0xd7 @ value
 
-	jmp	{value: i8}	     => 0xe0 @ value
+	jmp	{value}		     => 0xe0 @ value`8
 	jmp ({value: i8})	 => 0xe1 @ value
 	jmp ({value: i16})	 => 0xe1 @ value[7:0]
 	jmp ac				 => 0xe200
 	reti				 => 0xe300
 	
-	bgt {value: i8}	 	 => 0xe4 @ value
+	bgt {value}		 	 => 0xe4 @ value`8
 	bgt ({value: i8})	 => 0xe5 @ value
 	bgt ({value: i16})	 => 0xe5 @ value[7:0]
 	bgt ac				 => 0xe600
 	bgt y				 => 0xe700
 
-	blt {value: i8}		 => 0xe8 @ value
+	blt {value}			 => 0xe8 @ value`8
 	blt ({value: i8})	 => 0xe9 @ value
 	blt ({value: i16})	 => 0xe9 @ value[7:0]
 	blt ac				 => 0xea00
 	blt y				 => 0xeb00
 
-	bne {value: i8}		 => 0xec @ value
+	bne {value}			 => 0xec @ value`8
 	bne ({value: i8})	 => 0xed @ value
 	bne ({value: i16})	 => 0xed @ value[7:0]
 	bne ac				 => 0xee00
 	bne y				 => 0xef00
 
-	beq {value: i8}	 	 => 0xf0 @ value
+	beq {value}		 	 => 0xf0 @ value`8
 	beq ({value: i8})	 => 0xf1 @ value
 	beq ({value: i16})	 => 0xf1 @ value[7:0]
 	beq ac				 => 0xf200
 	beq y				 => 0xf300
 
-	bge {value: i8}		 => 0xf4 @ value
+	bge {value}			 => 0xf4 @ value`8
 	bge ({value: i8})	 => 0xf5 @ value
 	bge ({value: i16})	 => 0xf5 @ value[7:0]
 	bge ac				 => 0xf600
 	bge y				 => 0xf700
 
-	ble {value: i8}		 => 0xf8 @ value
+	ble {value}			 => 0xf8 @ value`8
 	ble ({value: i8})	 => 0xf9 @ value
 	ble ({value: i16})	 => 0xf9 @ value[7:0]
 	ble ac				 => 0xfa00
 	ble y				 => 0xfb00
 
-	bra {value: i8}		 => 0xfc @ value
+	bra {value}			 => 0xfc @ value`8
 	bra ({value: i8})	 => 0xfd @ value
 	bra ({value: i16})	 => 0xfd @ value[7:0]
 	bra ac				 => 0xfe00
 	bra y				 => 0xff00
 
+	mjmp {value:i16} => asm {
+		ldy #{value}[15:8]
+		jmp {value}[7:0]
+	}
 }
 
 VIDBLACK = 0x40
@@ -248,17 +250,21 @@ subLineMode : #res 1	; stores how many times mode has been called
 highEqCnt : #res 1		; number of high equalization pulses in this frame
 lowEqCnt : #res 1		; number of low equalization pulses in this frame
 
+testAddressHigh : #res 1
+testAddressLow : #res 1
+
 #bank prg
 
 interrupt:
 	; store registers and reload timer
 	sta acStore   ; #1
-	sty yStore    ; #2
+	lda y		  ; #2
+	sta yStore    ; #3
 	
 	; check for cold boot
-	lda bootCheck ; #3
-	xora #55      ; #4
-	bne boot      ; #5
+	lda bootCheck ; #4
+	xora #55      ; #5
+	bne boot      ; #6
 
     ; branch to one of three routines
 	; draw active lines (120 times per frame)
@@ -266,7 +272,7 @@ interrupt:
 	; low equalization half-line (6 times)
 	; high equalization half-line (6 times)
 	; blank lines (11 times)
-    bra (lineMode) ; #6
+    bra (lineMode) ; #7
 
 	;active line
 	;frontporch 10 clocks
@@ -278,74 +284,12 @@ interrupt:
 	;  then 12 high again, then 10 blank video lines
 
     ; Load line address
-activeVideo:
-    ldy yLineNumber ; #7
-    ldv (y,x)     ; #40  draw active video pixel
-	;; repeat 159 times    
-	ldv #VIDBLACK ; #1
-	
-	; increment line number
-	lda yLineNumber ; #2
-	adda #1			; #3
-	sta yLineNumber	; #4
-
-	; check if end of active lines
-	lda #120		; #5
-	xora y			; #6
-	beq highEqualization  ; #7 end of frame
-
-	nop ; #8
-    nop ; #9
-    ldv #VIDSYNC		  ; #10 - sync start (15 clocks)
-	nop ;#13
-	nop ;#14
-	nop ;#15
-	nop ;#16
-	nop ;#17
-	nop ;#18
-	; otherwise branch to active subline 
-	ldx #-11          ; #19 restart timer (tweak count)
-	bra (subLineMode) ; #20
-
-firstLineStart:
-	lda #secondLineStart  ; #21
-	sta subLineMode		  ; #22
-	lda acStore   ; #23
-	ldy yStore    ; #24
-	ldv #VIDBLACK ; #25 - sync ends
-	reti          ; #26
-	
-secondLineStart:
-	lda #thirdLineStart  ; #21
-	sta subLineMode		 ; #22
-	lda acStore   ; #23
-	ldy yStore    ; #24
-	ldv #VIDBLACK ; #25 - sync ends
-	reti          ; #26
-	
-thirdLineStart:
-	lda #fourthLineStart  ; #21
-	sta subLineMode		  ; #22
-	lda acStore   ; #23
-	ldy yStore    ; #24
-	ldv #VIDBLACK ; #25 - sync ends
-	reti          ; #26
-
-fourthLineStart:
-	lda #firstLineStart  ; #21
-	sta subLineMode		 ; #22
-	lda acStore   ; #23
-	ldy yStore    ; #24
-	ldv #VIDBLACK ; #25 - sync ends
-	reti          ; #26
 
 ;frontporch 5 clocks
 ;sync low 7 clocks
 ;sync high then return
 highEqualization:
-	bra (subLineMode) ; test active video only - remove later
-	
-	ldx #70		  ; #9 - restart timer with half a frame	
+	ldx #140		  ; #9 - restart timer with half a frame	
     ldv #VIDSYNC  ; #10 - sync start (7 clocks)
 	lda highEqCnt ; #11
 	adda #1	      ; #12
@@ -355,32 +299,115 @@ highEqualization:
 	xora #12	  ; #16
 	ldv #VIDBLACK ; #17
 
-	; going to next highEq, or to first lowEq, or to first blank line
+	; after 6 go to lowEq
+	; after 12 go to first blank line
+	; if 23, then reinitialize counter for first time
 
-	beq .nextBlankLine ; #14
+	beq .nextBlankLine
 
-	lda highEqCnt ; 
+	lda highEqCnt
 	xora #6
 	beq .nextLowEq
 
 	lda highEqCnt
-	xora #22
-	beq .firstHighEq ; if branch is taken, A will already be 0
+	xora #23
+	beq .firstHighEq ; if branch is taken, A is already 0
 	lda highEqCnt
 	.firstHighEq:  
 	adda #1
-	sta highEqCnt ; #16
-	lda #highEqualization ;#18
-	sta subLineMode ;#19
+	sta highEqCnt
+	lda #highEqualization
+	sta lineMode
+	lda acStore
+	ldy yStore
+	reti
 
 	.nextBlankLine:
+	;load blankline address to linemode 
+	; reload and return
+	lda #blankLine
+	sta lineMode
+	lda acStore
+	ldy yStore
+	reti
 	
 	.nextLowEq:
-
+	; load loweq address to linemode
+	; reload and return
+	sta lowEqCnt ; should be zero
+	lda #firstLowEq
+	sta lineMode
+	lda acStore
+	ldy yStore
+	reti
+	
+; firstLowEq - only sets sync low then returns
+firstLowEq:
+	ldx #140		  ; #9 - restart timer with half a frame	
+    ldv #VIDSYNC  ; #10 - sync start
+	lda #lowEqualization
+	sta lineMode
+	lda acStore
+	ldy yStore
+	reti
+	
+; lowEqualization does high pulse instead
 lowEqualization:
+	ldx #140		  	; #1 - restart timer with half a frame	
+    ldv #VIDBLACK  	; #2 - sync start
+	lda lowEqCnt   	; #3
+	adda #1			; #4
+	sta lowEqCnt	; #5
+	xora #6			; #6
+					; #7
+					; #8
+					; #9
+					; #10
+					; #11
+	ldv #VIDSYNC	; #12
+	beq .lastLowEq
+	lda acStore
+	ldy yStore
+	reti
 
+	.lastLowEq:
+	lda #highEqualization
+	sta lineMode
+	bra highEqualization ;immediately do a high eq sync
+	
+	
 blankLine:
+	;frontporch 10 clocks
+	;sync low 15 clocks
+	;sync high and return
+	ldx #70		  ; #9 - restart timer with half a frame	
+    ldv #VIDSYNC  ; #10 - sync start (15 clocks)
+	lda #blankLine	; #11
+	sta lineMode	; #12
+	lda highEqCnt ; #13
+	adda #1	      ; #14
+	sta highEqCnt ; #15
+	xora #22	  ; #16
+	nop ; #17
+	nop ; #18
+	nop ; #19
+	nop ; #20
+	nop ; #21
+	nop ; #22
+	nop ; #23
+	nop ; #24
+	ldv #VIDBLACK ; #25
+	bne .blankReturn
+	lda #129
+	sta yLineNumber		; restart Y line counter
+	lda #activeVideo	
+	sta lineMode		; back to drawing active lines
+	.blankReturn:
+	lda acStore
+	ldy yStore
+	reti
 
+	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                     boot
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -390,8 +417,11 @@ boot:
     sta bootCheck
 	lda #activeVideo
 	sta lineMode
-	clra
+	lda #firstLineStart
+	sta subLineMode
+	lda #129			; RAM page 1
 	sta yLineNumber
+	clra
 	sta highEqCnt
 	sta lowEqCnt
 	
@@ -403,5 +433,253 @@ main:
 		lda testCount
 		adda #1
 		sta (y,#0)
+
+	; load 8100 to counter
+	; copy low byte of counter to that memory address
+	; check if upper byte is F9 (last line)
+	; change to 81 if so
 		bra .loop
-		
+
+; function to write to any memory location
+; as part of boot procedure, load a function into ram so it can be self-modified
+
+; storing ram function:
+; load d into y
+; store ac to (y,d)
+; load d into y
+; jump to (y,d)		 
+
+; loading ram function:
+; load d into y
+; load (y,d) to ac
+; load d into y
+; jump to (y,d)		 
+
+; calling function:
+; store upper writing address into the first d ram address
+; store lower writing address into the second d ram address
+; store upper return address into  the third d ram address
+; store lower return address into  the fourth d ram address
+; store writing value into ac  (loading function can skip this step)
+; load y with ram function address
+; jump to ram function address
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 Active video lines
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+activeVideo:
+    ldy yLineNumber ; #8
+	lda #0xc0
+;	lda #VIDBLACK   ; #9
+    orv (y,x)     ; #40  draw active video pixel
+	orv (y,x)     ; #41  draw active video pixel
+	orv (y,x)     ; #42  draw active video pixel
+	orv (y,x)     ; #43  draw active video pixel
+	orv (y,x)     ; #44  draw active video pixel
+	orv (y,x)     ; #45  draw active video pixel
+	orv (y,x)     ; #46  draw active video pixel
+	orv (y,x)     ; #47  draw active video pixel
+	orv (y,x)     ; #48  draw active video pixel
+	orv (y,x)     ; #49  draw active video pixel
+	orv (y,x)     ; #50  draw active video pixel
+	orv (y,x)     ; #51  draw active video pixel
+	orv (y,x)     ; #52  draw active video pixel
+	orv (y,x)     ; #53  draw active video pixel
+	orv (y,x)     ; #54  draw active video pixel
+	orv (y,x)     ; #55  draw active video pixel
+	orv (y,x)     ; #56  draw active video pixel
+	orv (y,x)     ; #57  draw active video pixel
+	orv (y,x)     ; #58  draw active video pixel
+	orv (y,x)     ; #59  draw active video pixel
+	orv (y,x)     ; #60  draw active video pixel
+	orv (y,x)     ; #61  draw active video pixel
+	orv (y,x)     ; #62  draw active video pixel
+	orv (y,x)     ; #63  draw active video pixel
+	orv (y,x)     ; #64  draw active video pixel
+	orv (y,x)     ; #65  draw active video pixel
+	orv (y,x)     ; #66  draw active video pixel
+	orv (y,x)     ; #67  draw active video pixel
+	orv (y,x)     ; #68  draw active video pixel
+	orv (y,x)     ; #69  draw active video pixel
+	orv (y,x)     ; #70  draw active video pixel
+	orv (y,x)     ; #71  draw active video pixel
+	orv (y,x)     ; #72  draw active video pixel
+	orv (y,x)     ; #73  draw active video pixel
+	orv (y,x)     ; #74  draw active video pixel
+	orv (y,x)     ; #75  draw active video pixel
+	orv (y,x)     ; #76  draw active video pixel
+	orv (y,x)     ; #77  draw active video pixel
+	orv (y,x)     ; #78  draw active video pixel
+	orv (y,x)     ; #79  draw active video pixel
+	orv (y,x)     ; #80  draw active video pixel
+	orv (y,x)     ; #81  draw active video pixel
+	orv (y,x)     ; #82  draw active video pixel
+	orv (y,x)     ; #83  draw active video pixel
+	orv (y,x)     ; #84  draw active video pixel
+	orv (y,x)     ; #85  draw active video pixel
+	orv (y,x)     ; #86  draw active video pixel
+	orv (y,x)     ; #87  draw active video pixel
+	orv (y,x)     ; #88  draw active video pixel
+	orv (y,x)     ; #89  draw active video pixel
+	orv (y,x)     ; #90  draw active video pixel
+	orv (y,x)     ; #91  draw active video pixel
+	orv (y,x)     ; #92  draw active video pixel
+	orv (y,x)     ; #93  draw active video pixel
+	orv (y,x)     ; #94  draw active video pixel
+	orv (y,x)     ; #95  draw active video pixel
+	orv (y,x)     ; #96  draw active video pixel
+	orv (y,x)     ; #97  draw active video pixel
+	orv (y,x)     ; #98  draw active video pixel
+	orv (y,x)     ; #99  draw active video pixel
+	orv (y,x)     ; #100  draw active video pixel
+	orv (y,x)     ; #101  draw active video pixel
+	orv (y,x)     ; #102  draw active video pixel
+	orv (y,x)     ; #103  draw active video pixel
+	orv (y,x)     ; #104  draw active video pixel
+	orv (y,x)     ; #105  draw active video pixel
+	orv (y,x)     ; #106  draw active video pixel
+	orv (y,x)     ; #107  draw active video pixel
+	orv (y,x)     ; #108  draw active video pixel
+	orv (y,x)     ; #109  draw active video pixel
+	orv (y,x)     ; #110  draw active video pixel
+	orv (y,x)     ; #111  draw active video pixel
+	orv (y,x)     ; #112  draw active video pixel
+	orv (y,x)     ; #113  draw active video pixel
+	orv (y,x)     ; #114  draw active video pixel
+	orv (y,x)     ; #115  draw active video pixel
+	orv (y,x)     ; #116  draw active video pixel
+	orv (y,x)     ; #117  draw active video pixel
+	orv (y,x)     ; #118  draw active video pixel
+	orv (y,x)     ; #119  draw active video pixel
+	orv (y,x)     ; #120  draw active video pixel
+	orv (y,x)     ; #121  draw active video pixel
+	orv (y,x)     ; #122  draw active video pixel
+	orv (y,x)     ; #123  draw active video pixel
+	orv (y,x)     ; #124  draw active video pixel
+	orv (y,x)     ; #125  draw active video pixel
+	orv (y,x)     ; #126  draw active video pixel
+	orv (y,x)     ; #127  draw active video pixel
+	orv (y,x)     ; #128  draw active video pixel
+	orv (y,x)     ; #129  draw active video pixel
+	orv (y,x)     ; #130  draw active video pixel
+	orv (y,x)     ; #131  draw active video pixel
+	orv (y,x)     ; #132  draw active video pixel
+	orv (y,x)     ; #133  draw active video pixel
+	orv (y,x)     ; #134  draw active video pixel
+	orv (y,x)     ; #135  draw active video pixel
+	orv (y,x)     ; #136  draw active video pixel
+	orv (y,x)     ; #137  draw active video pixel
+	orv (y,x)     ; #138  draw active video pixel
+	orv (y,x)     ; #139  draw active video pixel
+	orv (y,x)     ; #140  draw active video pixel
+	orv (y,x)     ; #141  draw active video pixel
+	orv (y,x)     ; #142  draw active video pixel
+	orv (y,x)     ; #143  draw active video pixel
+	orv (y,x)     ; #144  draw active video pixel
+	orv (y,x)     ; #145  draw active video pixel
+	orv (y,x)     ; #146  draw active video pixel
+	orv (y,x)     ; #147  draw active video pixel
+	orv (y,x)     ; #148  draw active video pixel
+	orv (y,x)     ; #149  draw active video pixel
+	orv (y,x)     ; #150  draw active video pixel
+	orv (y,x)     ; #151  draw active video pixel
+	orv (y,x)     ; #152  draw active video pixel
+	orv (y,x)     ; #153  draw active video pixel
+	orv (y,x)     ; #154  draw active video pixel
+	orv (y,x)     ; #155  draw active video pixel
+	orv (y,x)     ; #156  draw active video pixel
+	orv (y,x)     ; #157  draw active video pixel
+	orv (y,x)     ; #158  draw active video pixel
+	orv (y,x)     ; #159  draw active video pixel
+	orv (y,x)     ; #160  draw active video pixel
+	orv (y,x)     ; #161  draw active video pixel
+	orv (y,x)     ; #162  draw active video pixel
+	orv (y,x)     ; #163  draw active video pixel
+	orv (y,x)     ; #164  draw active video pixel
+	orv (y,x)     ; #165  draw active video pixel
+	orv (y,x)     ; #166  draw active video pixel
+	orv (y,x)     ; #167  draw active video pixel
+	orv (y,x)     ; #168  draw active video pixel
+	orv (y,x)     ; #169  draw active video pixel
+	orv (y,x)     ; #170  draw active video pixel
+	orv (y,x)     ; #171  draw active video pixel
+	orv (y,x)     ; #172  draw active video pixel
+	orv (y,x)     ; #173  draw active video pixel
+	orv (y,x)     ; #174  draw active video pixel
+	orv (y,x)     ; #175  draw active video pixel
+	orv (y,x)     ; #176  draw active video pixel
+	orv (y,x)     ; #177  draw active video pixel
+	orv (y,x)     ; #178  draw active video pixel
+	orv (y,x)     ; #179  draw active video pixel
+	orv (y,x)     ; #180  draw active video pixel
+	orv (y,x)     ; #181  draw active video pixel
+	orv (y,x)     ; #182  draw active video pixel
+	orv (y,x)     ; #183  draw active video pixel
+	orv (y,x)     ; #184  draw active video pixel
+	orv (y,x)     ; #185  draw active video pixel
+	orv (y,x)     ; #186  draw active video pixel
+	orv (y,x)     ; #187  draw active video pixel
+	orv (y,x)     ; #188  draw active video pixel
+	orv (y,x)     ; #189  draw active video pixel
+	orv (y,x)     ; #190  draw active video pixel
+	orv (y,x)     ; #191  draw active video pixel
+	orv (y,x)     ; #192  draw active video pixel
+	orv (y,x)     ; #193  draw active video pixel
+	orv (y,x)     ; #194  draw active video pixel
+	orv (y,x)     ; #195  draw active video pixel
+	orv (y,x)     ; #196  draw active video pixel
+	orv (y,x)     ; #197  draw active video pixel
+	orv (y,x)     ; #198  draw active video pixel
+	orv (y,x)     ; #199  draw active video pixel
+			;; repeat 159 times    
+	ldv #VIDBLACK ; #1
+	
+	; check if end of active lines
+	lda #249		; #2    81+160
+	xora y			; #3
+	bne .continueActive  ; #4 end of frame
+
+;	ldy #highEqualization[15:8]
+;	jmp highEqualization 
+	mjmp highEqualization
+
+	
+	.continueActive:
+	nop ; #5
+    nop ; #6
+    nop ; #7
+    nop ; #8
+    nop ; #9
+    ldv #VIDSYNC		  ; #10 - sync start (15 clocks)
+	nop ;#11
+	nop ;#12
+	nop ;#13
+	nop ;#14
+	nop ;#15
+	nop ;#16
+	nop ;#17
+	nop ;#18
+	; otherwise branch to active subline 
+	ldx #-12          ; #19 restart timer (tweak count)
+	bra (subLineMode) ; #20
+
+firstLineStart:
+	lda #secondLineStart  ; #21
+	sta subLineMode		  ; #22
+	lda acStore   ; #23
+	ldy yStore    ; #24
+	ldv #VIDBLACK ; #25 - sync ends
+	reti          ; #26
+	
+secondLineStart:
+	; increment line number
+	lda yLineNumber ; #21
+	adda #1			; #22
+	sta yLineNumber	; #23
+
+	lda #firstLineStart  ; #24
+	ldv #VIDBLACK 		 ; #25 - sync ends
+	sta subLineMode		 ; #26
+	lda acStore   ; #27
+	ldy yStore    ; #28
+	reti          ; #29

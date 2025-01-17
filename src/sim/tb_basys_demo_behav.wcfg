@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="91794684fs"></ZoomStartTime>
-      <ZoomEndTime time="108401436fs"></ZoomEndTime>
-      <Cursor1Time time="33705fs"></Cursor1Time>
+      <ZoomStartTime time="26901078061fs"></ZoomStartTime>
+      <ZoomEndTime time="54619784388fs"></ZoomEndTime>
+      <Cursor1Time time="50000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="148"></NameColumnWidth>
+      <NameColumnWidth column_width="100"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="50" />
+   <WVObjectSize size="53" />
    <wvobject fp_name="/tb_basys_demo/clkSys" type="logic">
       <obj_property name="ElementShortName">clkSys</obj_property>
       <obj_property name="ObjectShortName">clkSys</obj_property>
@@ -176,6 +176,7 @@
       <obj_property name="ElementShortName">data[7:0]</obj_property>
       <obj_property name="ObjectShortName">data[7:0]</obj_property>
       <obj_property name="label">yReg</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/vidReg" type="array">
       <obj_property name="ElementShortName">vidReg[7:0]</obj_property>
@@ -228,5 +229,25 @@
    <wvobject fp_name="/tb_basys_demo/dut/cpuComp/audioReg" type="array">
       <obj_property name="ElementShortName">audioReg[7:0]</obj_property>
       <obj_property name="ObjectShortName">audioReg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/immMemEn" type="logic">
+      <obj_property name="ElementShortName">immMemEn</obj_property>
+      <obj_property name="ObjectShortName">immMemEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/xMemEn" type="logic">
+      <obj_property name="ElementShortName">xMemEn</obj_property>
+      <obj_property name="ObjectShortName">xMemEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_basys_demo/dut/cpuComp/vidReg" type="array">
+      <obj_property name="ElementShortName">vidReg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vidReg[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
+      <obj_property name="AnalogYRangeMin">1.84467e+19</obj_property>
+      <obj_property name="AnalogYRRangeMax">160</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
    </wvobject>
 </wave_config>
