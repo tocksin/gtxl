@@ -289,33 +289,28 @@ interrupt:
 ;sync low 7 clocks
 ;sync high then return
 highEqualization:
-	ldx #140		  ; #9 - restart timer with half a frame	
-    ldv #VIDSYNC  ; #10 - sync start (7 clocks)
-	lda highEqCnt ; #11
-	adda #1	      ; #12
-	sta highEqCnt ; #13
-	nop ; #14
-	nop ; #15
-	xora #12	  ; #16
-	ldv #VIDBLACK ; #17
+	ldx #162		; #9 - restart timer with half a frame	
+    ldv #VIDSYNC  	; #10 - sync start (7 clocks)
+	lda highEqCnt	; #11
+	xora #24		; #12
+	beq .firstHighEq ; if branch is taken, A is already 0
+	lda highEqCnt	; #14
+	.firstHighEq:  	; #15
+	adda #1 		; #16
+	nop				; #17
+	ldv #VIDBLACK 	; #18
+	sta highEqCnt	; #19
 
+	; if 23, then reinitialize counter for first time
 	; after 6 go to lowEq
 	; after 12 go to first blank line
-	; if 23, then reinitialize counter for first time
-
+	xora #12
 	beq .nextBlankLine
 
 	lda highEqCnt
 	xora #6
 	beq .nextLowEq
 
-	lda highEqCnt
-	xora #23
-	beq .firstHighEq ; if branch is taken, A is already 0
-	lda highEqCnt
-	.firstHighEq:  
-	adda #1
-	sta highEqCnt
 	lda #highEqualization
 	sta lineMode
 	lda acStore
@@ -343,7 +338,7 @@ highEqualization:
 	
 ; firstLowEq - only sets sync low then returns
 firstLowEq:
-	ldx #140		  ; #9 - restart timer with half a frame	
+	ldx #162		  ; #9 - restart timer with half a frame	
     ldv #VIDSYNC  ; #10 - sync start
 	lda #lowEqualization
 	sta lineMode
@@ -353,17 +348,22 @@ firstLowEq:
 	
 ; lowEqualization does high pulse instead
 lowEqualization:
-	ldx #140		  	; #1 - restart timer with half a frame	
+	ldx #162	  	; #1 - restart timer with half a frame	
     ldv #VIDBLACK  	; #2 - sync start
 	lda lowEqCnt   	; #3
 	adda #1			; #4
 	sta lowEqCnt	; #5
 	xora #6			; #6
-					; #7
-					; #8
-					; #9
-					; #10
-					; #11
+	nop				; #7
+	nop				; #8
+	nop				; #9
+	nop				; #10
+	nop				; #11
+	nop				; #12
+	nop				; #12
+	nop				; #12
+	nop				; #12
+	nop				; #12
 	ldv #VIDSYNC	; #12
 	beq .lastLowEq
 	lda acStore
@@ -380,14 +380,14 @@ blankLine:
 	;frontporch 10 clocks
 	;sync low 15 clocks
 	;sync high and return
-	ldx #70		  ; #9 - restart timer with half a frame	
+	ldx #60		  ; #9 - restart timer with half a frame	
     ldv #VIDSYNC  ; #10 - sync start (15 clocks)
 	lda #blankLine	; #11
 	sta lineMode	; #12
 	lda highEqCnt ; #13
 	adda #1	      ; #14
 	sta highEqCnt ; #15
-	xora #22	  ; #16
+	xora #24	  ; #16
 	nop ; #17
 	nop ; #18
 	nop ; #19
@@ -402,6 +402,7 @@ blankLine:
 	sta yLineNumber		; restart Y line counter
 	lda #activeVideo	
 	sta lineMode		; back to drawing active lines
+	ldx #-15          ; #19 restart timer (tweak count)
 	.blankReturn:
 	lda acStore
 	ldy yStore
@@ -660,7 +661,7 @@ activeVideo:
 	nop ;#17
 	nop ;#18
 	; otherwise branch to active subline 
-	ldx #-12          ; #19 restart timer (tweak count)
+	ldx #-16          ; #19 restart timer (tweak count)
 	bra (subLineMode) ; #20
 
 firstLineStart:
