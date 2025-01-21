@@ -6,6 +6,44 @@
 	(paper "B")
 	(lib_symbols)
 	(sheet
+		(at 95.885 90.805)
+		(size 33.02 15.875)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "096d775d-4f8c-4f5c-ac8a-0d330a2571c8")
+		(property "Sheetname" "Keyboard"
+			(at 95.885 90.0934 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "KEEB.kicad_sch"
+			(at 95.885 107.2646 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "gtxl"
+				(path "/2dd80149-0e94-4467-bb5a-52cd819c450a"
+					(page "9")
+				)
+			)
+		)
+	)
+	(sheet
 		(at 116.205 137.795)
 		(size 31.115 13.97)
 		(fields_autoplaced yes)
@@ -76,7 +114,7 @@
 		(instances
 			(project "gtxl"
 				(path "/2dd80149-0e94-4467-bb5a-52cd819c450a"
-					(page "3")
+					(page "4")
 				)
 			)
 		)
@@ -114,7 +152,7 @@
 		(instances
 			(project "gtxl"
 				(path "/2dd80149-0e94-4467-bb5a-52cd819c450a"
-					(page "4")
+					(page "2")
 				)
 			)
 		)
@@ -266,7 +304,7 @@
 		(instances
 			(project "gtxl"
 				(path "/2dd80149-0e94-4467-bb5a-52cd819c450a"
-					(page "2")
+					(page "3")
 				)
 			)
 		)

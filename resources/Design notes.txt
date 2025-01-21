@@ -14,6 +14,22 @@ Redesign gigatron into output with lumacode instead of VGA
         This enables a vonNeumann architecture
     For a 55ns memory, need to setup the address within 105.83-55=50.83ns max delay
         Assuming we enable write on second half of clock only
+    Back porch is 1.5 us, or 5 clocks, but I will add 5 extra (active drawing is normally 165 clocks)
+    Horizontal blanking is 4.7us or 15 clocks
+    Front porch is also 4.7us or 15 clocks
+    For every line, we have 200 instructions we can execute during active lines
+        160 instructions must be for copying RAM to video output
+        40 instructions for all other handling:
+            Storing and restoring AC and Y
+            check if reset
+            Load line address
+            branch to one of four routines - the last will increment Y.  
+                each will bump branch address to next routine.
+            turn on and off the horizontal sync at the right time
+            check if we can switch to blank lines
+            return from interrupt
+            optionally: we can service the audio output
+
 
     It might be possible to do VGA at the same time with only a software change
         VGA is 31.777us per line.  Almost exactly twice as fast as composite.
