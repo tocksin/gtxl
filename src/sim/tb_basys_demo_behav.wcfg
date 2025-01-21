@@ -13,18 +13,17 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="15457387483fs"></ZoomStartTime>
-      <ZoomEndTime time="16230387484fs"></ZoomEndTime>
-      <Cursor1Time time="15660387483fs"></Cursor1Time>
+      <ZoomStartTime time="16691200183fs"></ZoomStartTime>
+      <ZoomEndTime time="16925478000fs"></ZoomEndTime>
+      <Cursor1Time time="16804196157fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="64"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="155"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="53" />
    <wave_markers>
-      <marker time="16301755147" label="" />
-      <marker time="15655715062" label="" />
+      <marker time="16740651231" label="" />
    </wave_markers>
    <wvobject fp_name="/tb_basys_demo/clkSys" type="logic">
       <obj_property name="ElementShortName">clkSys</obj_property>
@@ -247,7 +246,6 @@
       <obj_property name="ObjectShortName">vidReg[7:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
       <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
       <obj_property name="AnalogYRangeMin">1.84467e+19</obj_property>
       <obj_property name="AnalogYRRangeMax">158</obj_property>
       <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>

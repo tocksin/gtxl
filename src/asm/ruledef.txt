@@ -304,7 +304,7 @@ highEqualization:
 	; if 23, then reinitialize counter for first time
 	; after 6 go to lowEq
 	; after 12 go to first blank line
-	xora #12
+	xora #11
 	beq .nextBlankLine
 
 	lda highEqCnt
@@ -360,53 +360,57 @@ lowEqualization:
 	nop				; #10
 	nop				; #11
 	nop				; #12
-	nop				; #12
-	nop				; #12
-	nop				; #12
-	nop				; #12
-	ldv #VIDSYNC	; #12
-	beq .lastLowEq
-	lda acStore
+	nop				; #13
+	nop				; #14
+	nop				; #15
+	nop				; #16
+	ldv #VIDSYNC	; #17
+	beq .lastLowEq  ; #1
+	lda acStore		
 	ldy yStore
 	reti
 
 	.lastLowEq:
-	lda #highEqualization
-	sta lineMode
-	bra highEqualization ;immediately do a high eq sync
+	lda #highEqualization	; #2
+	sta lineMode			; #3
+	ldx #167				; #4 - restart timer with half a frame	
+	nop ; #5
+	nop ; #6
+	ldv #VIDBLACK 	; #7 - sync ends (7 clocks)
+	lda acStore		
+	ldy yStore
+	reti
 	
 	
 blankLine:
 	;frontporch 10 clocks
 	;sync low 15 clocks
 	;sync high and return
-	ldx #60		  ; #9 - restart timer with half a frame	
-    ldv #VIDSYNC  ; #10 - sync start (15 clocks)
+	ldx #60		  	; #9 - restart timer with half a frame	
+    ldv #VIDSYNC  	; #10 - sync start (15 clocks)
 	lda #blankLine	; #11
 	sta lineMode	; #12
-	lda highEqCnt ; #13
-	adda #1	      ; #14
-	sta highEqCnt ; #15
-	xora #24	  ; #16
-	nop ; #17
+	lda highEqCnt	; #13
+	adda #1	      	; #14
+	sta highEqCnt 	; #15
+	lda #129 		; #16  
+	sta yLineNumber ; #17  		restart Y line counter
 	nop ; #18
 	nop ; #19
 	nop ; #20
 	nop ; #21
 	nop ; #22
-	nop ; #23
-	nop ; #24
-	ldv #VIDBLACK ; #25
-	bne .blankReturn
-	lda #129
-	sta yLineNumber		; restart Y line counter
-	lda #activeVideo	
-	sta lineMode		; back to drawing active lines
-	ldx #-15          ; #19 restart timer (tweak count)
+	lda highEqCnt 		; #23
+	xora #24	 		; #24
+	ldv #VIDBLACK 		; #25
+	bne .blankReturn	; #26
+	lda #activeVideo	; #27
+	sta lineMode		; #28 back to drawing active lines
+	ldx #-6          	; #29 restart timer
 	.blankReturn:
-	lda acStore
-	ldy yStore
-	reti
+	lda acStore			; #30
+	ldy yStore			; #31
+	reti				; #32
 
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
